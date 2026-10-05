@@ -7,24 +7,15 @@ document.getElementById("btn-upload").addEventListener("click", async () => {
   const errBox = document.getElementById("bulk-errors");
   errBox.classList.add("hidden");
   const fileInput = document.getElementById("csv-file");
-  const text = document.getElementById("csv-text").value.trim();
 
   try {
-    let res;
-    if (fileInput.files.length) {
-      const fd = new FormData();
-      fd.append("file", fileInput.files[0]);
-      res = await api("/api/predict/bulk", { method: "POST", body: fd });
-    } else if (text) {
-      res = await api("/api/predict/bulk", {
-        method: "POST",
-        headers: { "Content-Type": "text/csv" },
-        body: text,
-      });
-    } else {
-      throw new Error("Choose a CSV file or paste CSV text first.");
+    if (!fileInput.files.length) {
+      throw new Error("Choose a CSV file first.");
     }
-    BULK_RESULTS = res.results || [];
+    const fd = new FormData();
+    fd.append("file", fileInput.files[0]);
+    const res = await api("/api/predict/bulk", { method: "POST", body: fd });
+    BULK_RESULTS = (res && res.results) || [];
     renderBulk(res);
   } catch (err) {
     errBox.textContent = err.message;

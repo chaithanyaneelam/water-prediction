@@ -7,9 +7,9 @@
 <div class="card">
   <h2>Upload CSV</h2>
   <input type="file" id="csv-file" accept=".csv,text/csv">
-  <p class="note">...or paste CSV text (first row = headers):</p>
-  <textarea id="csv-text" rows="5" style="width:100%;"
-    placeholder="ph,Hardness,Solids,Chloramines,Sulfate,Conductivity,Organic_carbon,Trihalomethanes,Turbidity"></textarea>
+  <p class="note">First row must be the headers: ph, Hardness, Solids, Chloramines, Sulfate,
+    Conductivity, Organic_carbon, Trihalomethanes, Turbidity. pH may be blank; the other
+    eight are required. A sample file is included in the project: sample_bulk_upload.csv.</p>
   <button class="btn" id="btn-upload">Predict all rows</button>
   <div id="bulk-errors" class="error-box hidden"></div>
 </div>

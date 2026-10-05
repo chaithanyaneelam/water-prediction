@@ -86,14 +86,23 @@ def predict_and_persist(parsed: dict, source: str = "manual") -> dict:
 def parse_bulk_csv(content: str, source: str = "bulk") -> dict:
     """Parse + validate + predict a CSV. Returns results, row errors, and summary."""
     try:
-        df = pd.read_csv(io.StringIO(content))
+        # utf-8-sig transparently strips the BOM that Excel exports add.
+        df = pd.read_csv(io.StringIO(content), encoding="utf-8-sig")
     except Exception as exc:
         raise ValidationError([f"Could not parse CSV: {exc}"])
 
-    lookup = {c.strip().lower(): c for c in df.columns}
+    def _norm(col: str) -> str:
+        return str(col).strip().lstrip("\ufeff").strip().lower()
+
+    lookup = {_norm(c): c for c in df.columns}
     missing = [f for f in FEATURE_COLS if f.lower() not in lookup]
     if missing:
-        raise ValidationError([f"CSV missing required columns: {missing}"])
+        raise ValidationError([
+            f"CSV is missing required column(s): {missing}. "
+            f"Found these columns instead: {list(df.columns)}. "
+            "The header row must be: " + ",".join(FEATURE_COLS) +
+            " (see sample_bulk_upload.csv in the project folder)."
+        ])
     df = df.rename(columns={lookup[f.lower()]: f for f in FEATURE_COLS if f.lower() in lookup})
 
     results, errors = [], []

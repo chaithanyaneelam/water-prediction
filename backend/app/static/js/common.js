@@ -56,6 +56,10 @@ async function api(path, options) {
     const msg = (body && (body.error || (body.errors || []).join(", "))) || `HTTP ${res.status}`;
     throw new Error(msg);
   }
+  if (body === null) {
+    // A 200 without JSON would crash callers later - surface it clearly here.
+    throw new Error("Server returned an unexpected (non-JSON) response. Please retry.");
+  }
   return body;
 }
 

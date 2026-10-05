@@ -15,15 +15,25 @@ class ValidationError(Exception):
 
 
 def _to_float(value):
-    """Accept numbers or numeric strings; reject bools, blanks become None."""
+    """Accept numbers or numeric strings; reject bools; blanks/NaN become None.
+
+    NaN must be treated as MISSING: it would otherwise slip past range checks
+    (every comparison with NaN is False) and break the DB insert and the JSON
+    response (bare NaN is invalid JSON for browsers).
+    """
     if value is None or value == "":
         return None
     if isinstance(value, bool):
         raise ValueError("must be a number")
     try:
-        return float(value)
+        v = float(value)
     except (TypeError, ValueError):
         raise ValueError(f"'{value}' is not a number")
+    if v != v:  # NaN is the only value that is not equal to itself
+        return None
+    if v in (float("inf"), float("-inf")):
+        raise ValueError("infinity is not a valid measurement")
+    return v
 
 
 def validate_reading(data: dict, *, require_all: bool = True) -> dict:
