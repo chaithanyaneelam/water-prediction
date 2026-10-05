@@ -17,11 +17,15 @@ def dataset_summary() -> dict:
         "outlier_counts": _read(f"{DATASET_DIR}/outlier_counts.json"),
         "imputation_comparison": _read(f"{DATASET_DIR}/imputation_comparison.json"),
         "summary_stats": summary_stats_table(),
-        "available": all(data[k] is not None for k in
-                         ("class_balance", "missing_values", "correlation_matrix")),
-        "hint": None if data["class_balance"] is not None else
-                "Dataset explorer artifacts not found. Run: python -m backend.ml.train_all",
     }
+    data["available"] = all(
+        data[k] is not None
+        for k in ("class_balance", "missing_values", "correlation_matrix")
+    )
+    data["hint"] = (
+        None if data["class_balance"] is not None
+        else "Dataset explorer artifacts not found. Run: python -m backend.ml.train_all"
+    )
     return data
 
 
