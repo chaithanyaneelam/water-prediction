@@ -23,6 +23,21 @@
 9. **XGBoost determinism.** Results are seeded, but XGBoost can vary slightly across
    CPU architectures/versions; regenerate artifacts with the included one command.
 
+## Irrigation-specific limitations
+
+- **Single region, one state:** the irrigation model trains on 1,090 Telangana (India)
+  groundwater samples. Thresholds (USSL, RSC) are international standards, but the
+  label distribution and ion ranges are regional.
+- **Label conventions differ from textbook formulas in places:** the dataset's own RSC
+  column disagrees with the standard formula on most rows (we could not reproduce their
+  exact ion convention), though their class labels follow the standard 1.25/2.5 meq/L
+  thresholds. The app's rule engine uses the standard formula and says so.
+- **Hazards not modelled:** boron toxicity, specific-ion effects (chloride, nitrate on
+  sensitive crops), clogging/emitter risk, soil drainage and crop water demand.
+- **Rare classes excluded from ML:** USSL classes with fewer than 10 samples (36 rows)
+  are documented and excluded, so the ML cross-check never predicts them; the rule
+  engine still classifies them correctly.
+
 ## Deliberate exclusions (per project scope)
 
 No alerts or notifications, no IoT/MQTT/LoRa, no Docker/Kubernetes/cloud, no Grafana,

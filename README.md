@@ -14,6 +14,10 @@ pip install -r requirements.txt
 # 1) Put the Kaggle CSV at data/real/water_potability.csv, then train everything:
 python -m backend.ml.train_all
 
+# Irrigation module (separate real dataset, Telangana groundwater - file is included):
+python -m backend.ml.load_irrigation_dataset
+python -m backend.ml.train_irrigation
+
 # 2) Start the site (Flask serves frontend + API - ONE command):
 python run.py                              # -> http://127.0.0.1:5000
 
@@ -24,7 +28,7 @@ python simulator/simulate.py -n 10 -i 2
 Tests:
 
 ```bash
-python -m pytest tests/ -q                 # 26 tests: API, validation, leakage, fault-injection
+python -m pytest tests/ -q                 # 35 tests: API, validation, leakage, fault-injection, irrigation rules
 python -m backend.ml.train_all --smoke     # end-to-end pipeline check on a tiny test-only fixture
 ```
 
@@ -41,6 +45,7 @@ Bulk Upload page to see the whole flow with 10 example readings.
 | History | searchable/filterable/paginated table, export CSV, readings-over-time chart (g25) |
 | Model Comparison | graphs 7-23 in tabs: RF vs Decision Tree vs XGBoost, pH regressor vs baseline, Isolation Forest |
 | Dataset Explorer | graphs 1-6 + summary statistics |
+| Irrigation | USSL/RSC rule-engine verdict + ML cross-check on real Telangana groundwater data, USSL diagram, confusion matrix |
 
 ## API
 

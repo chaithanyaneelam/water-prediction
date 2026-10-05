@@ -75,3 +75,37 @@ SOURCE_FOOTNOTE = (
 
 # ---------------------------------------------------------------- random state
 RANDOM_STATE = 42
+
+# ---------------------------------------------------------------- IRRIGATION
+# Real dataset: Telangana groundwater quality (Kaggle,
+# sadiyazubair/telangana-ground-water-classification, 1,090 samples).
+IRRIGATION_XLSX = os.path.join(DATA_DIR, "irrigation_groundwater_telangana.xlsx")
+
+# Chemistry features for the irrigation ML model (labels SAR/ussl_class/rsc_class
+# are NEVER features - see tests/test_irrigation.py).
+IRRIGATION_FEATURES = [
+    "ph", "EC", "TDS", "CO3", "HCO3", "Cl", "F", "NO3",
+    "SO4", "Na", "K", "Ca", "Mg", "TH",
+]
+
+# USSL (Richards 1954) salinity classes from EC in uS/cm.
+USSL_EC_CLASSES = [
+    ("C1", 0.0, 250.0, "Low salinity - suitable for most crops"),
+    ("C2", 250.0, 750.0, "Medium salinity - fine with moderate leaching"),
+    ("C3", 750.0, 2250.0, "High salinity - salt-tolerant crops + good drainage"),
+    ("C4", 2250.0, float("inf"), "Very high salinity - generally unsuitable"),
+]
+# USSL sodium (alkali) classes from SAR.
+USSL_SAR_CLASSES = [
+    ("S1", 0.0, 10.0, "Low sodium - safe for nearly all soils"),
+    ("S2", 10.0, 18.0, "Medium sodium - fine with leaching + organic matter"),
+    ("S3", 18.0, 26.0, "High sodium - sodium hazard; gypsum + drainage needed"),
+    ("S4", 26.0, float("inf"), "Very high sodium - generally unsuitable"),
+]
+# RSC classes (Richards): meq/L thresholds.
+RSC_CLASSES = [
+    ("P.S.", float("-inf"), 1.25, "Safe - residual sodium carbonate acceptable"),
+    ("MR", 1.25, 2.5, "Marginal - watch for carbonate accumulation"),
+    ("U.S.", 2.5, float("inf"), "Unsuitable - carbonate alkali hazard"),
+]
+IRRIGATION_USSL_MIN_CLASS_SIZE = 10  # rare USSL classes are excluded from ML (documented)

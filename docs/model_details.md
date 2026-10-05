@@ -74,6 +74,43 @@ split: **104/656 rows (~15.9%) flagged** as statistical outliers, with the thres
 full score distribution shown in graph 21. Rules (pH range, negatives, extreme turbidity)
 combine with the IF flag to produce the human-readable reason shown on the Predict page.
 
+## Irrigation module (real Telangana groundwater data)
+
+**Dataset:** 1,090 real groundwater samples from Telangana, India (Kaggle,
+`sadiyazubair/telangana-ground-water-classification`), each with full ionic chemistry
+(pH, EC, TDS, CO3, HCO3, Cl, F, NO3, SO4, Na, K, Ca, Mg, TH) and two label columns:
+the USSL class (e.g. C3S1) and the RSC class (P.S./MR/U.S.).
+
+**Two decision paths, reported side by side in the app:**
+
+1. **Rule engine (primary, exact):** SAR = Na/sqrt((Ca+Mg)/2) (meq/L);
+   RSC = (CO3+HCO3)-(Ca+Mg) (meq/L); USSL class = EC-based salinity C1-C4 x
+   SAR-based sodium S1-S4 (Richards 1954); RSC class thresholds 1.25 / 2.5 meq/L.
+   Verified against the dataset's own columns: SAR agreement 99.6% (within 5%),
+   USSL rule agreement 91.7% (the dataset's labels deviate from the strict formula
+   on ~8% of rows - reported, not hidden).
+2. **ML cross-check:** RandomForest on the 14 chemistry features (labels never
+   features - tested), 5 USSL classes with >= 10 samples (1054 rows; 36 rare-class
+   rows excluded, documented), split-first 20% test, median-impute + scale pipeline,
+   GridSearchCV inner 5-fold (macro-F1).
+
+| Irrigation model | CV macro-F1 | Test accuracy | Test macro-F1 | Majority baseline |
+|---|---|---|---|---|
+| RandomForest (USSL class) | 0.798 | **0.953** | 0.801 | 0.668 |
+
+**Honest reading:** accuracy is high because the USSL class is nearly a deterministic
+function of EC and SAR - the rule engine computes it exactly, and the ML model mostly
+re-learns those thresholds plus the dataset's label noise. The ML value is (a) a
+probability for borderline cases and (b) class prediction when some ion values are
+missing (imputed). The RSC formula recomputed from ions agrees with the dataset's
+labels in 93.7% of rows (their RSC column uses a slightly different convention -
+documented in `limitations.md`).
+
+**Limitations specific to irrigation:** single-region data (Telangana, pre/post-monsoon
+2018+); USSL/RSC cover salinity and sodium hazards only - boron, specific-ion toxicity
+and drainage context are not modelled; crop suitability notes are generic guidance,
+not agronomic advice.
+
 ## Graph descriptions (as implemented)
 
 | # | Graph | Type | Source |

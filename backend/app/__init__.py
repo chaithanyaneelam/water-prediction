@@ -45,6 +45,7 @@ def create_app() -> Flask:
     from backend.app.blueprints.stats_api import bp as stats_bp
     from backend.app.blueprints.models_api import bp as models_bp
     from backend.app.blueprints.dataset_api import bp as dataset_bp
+    from backend.app.blueprints.irrigation_api import bp as irrigation_bp
 
     app.register_blueprint(pages_bp)
     app.register_blueprint(predict_bp)
@@ -52,6 +53,7 @@ def create_app() -> Flask:
     app.register_blueprint(stats_bp)
     app.register_blueprint(models_bp)
     app.register_blueprint(dataset_bp)
+    app.register_blueprint(irrigation_bp)
 
     @app.get("/api/health")
     def health():

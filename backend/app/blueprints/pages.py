@@ -32,3 +32,8 @@ def comparison():
 @bp.get("/explorer")
 def explorer():
     return render_template("explorer.html")
+
+
+@bp.get("/irrigation")
+def irrigation():
+    return render_template("irrigation.html")

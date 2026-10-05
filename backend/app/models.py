@@ -71,3 +71,40 @@ class ModelRun(db.Model):
     trained_on = db.Column(db.String(20), nullable=False, default="real")  # real|smoke
     metrics_path = db.Column(db.String(200))
     notes = db.Column(db.Text)
+
+
+class IrrigationReading(db.Model):
+    """One irrigation suitability check (rule engine + ML cross-check)."""
+    __tablename__ = "irrigation_readings"
+
+    id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
+    source = db.Column(db.String(20), nullable=False, default="manual")
+
+    # inputs (mg/L unless noted)
+    ph = db.Column(db.Float)
+    EC = db.Column(db.Float, nullable=False)   # uS/cm
+    TDS = db.Column(db.Float)
+    CO3 = db.Column(db.Float)
+    HCO3 = db.Column(db.Float, nullable=False)
+    Cl = db.Column(db.Float)
+    F = db.Column(db.Float)
+    NO3 = db.Column(db.Float)
+    SO4 = db.Column(db.Float)
+    Na = db.Column(db.Float, nullable=False)
+    K = db.Column(db.Float)
+    Ca = db.Column(db.Float, nullable=False)
+    Mg = db.Column(db.Float, nullable=False)
+    TH = db.Column(db.Float)
+
+    # rule-engine outputs (deterministic formulas)
+    SAR = db.Column(db.Float)
+    RSC = db.Column(db.Float)
+    ussl_class_rule = db.Column(db.String(8))
+    rsc_class_rule = db.Column(db.String(8))
+    suitable = db.Column(db.Boolean)
+    verdict_notes = db.Column(db.Text)
+
+    # ML cross-check
+    ml_ussl_class = db.Column(db.String(8))
+    ml_probability = db.Column(db.Float)

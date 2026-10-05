@@ -4,4 +4,43 @@
 WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
  * Running on http://127.0.0.1:5000
 Press CTRL+C to quit
-127.0.0.1 - - [05/Oct/2026 16:58:36] "POST /api/predict/bulk HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:34:49] "POST /api/irrigation/predict HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 17:34:50] "GET /api/irrigation/summary HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:34:55] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:35:05] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:35:15] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:35:25] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:35:35] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:35:45] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:35:55] "GET /api/stats HTTP/1.1" 200 -
+C:\Users\nspri\Desktop\WATER_PREDICTION\backend\ml\preprocess.py:25: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  return X.fillna(self.medians_).infer_objects(copy=False)
+127.0.0.1 - - [05/Oct/2026 17:36:02] "POST /api/irrigation/predict HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:36:05] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:36:15] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:36:25] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:36:35] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:36:45] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:36:55] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:37:05] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:37:15] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:37:25] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:37:35] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:37:45] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:37:55] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:38:05] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:38:15] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:38:25] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:38:35] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:38:45] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:38:55] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:39:05] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:39:15] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:39:25] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:39:35] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:39:45] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:39:55] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:40:05] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:40:15] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:40:25] "GET /api/stats HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 17:40:35] "GET /api/stats HTTP/1.1" 200 -
