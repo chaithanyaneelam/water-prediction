@@ -1,20 +1,20 @@
 """Prediction notification service.
 
 Channel per user (chosen at registration):
-- email -> SMTP email (configured via .env; see .env.example)
-- sms   -> Twilio-compatible REST API (configured via .env)
+- email -> Brevo (Sendinblue) transactional email API   (BREVO_API_KEY in .env)
+- sms   -> TextBelt SMS API                             (SMS_API_KEY in .env)
 - outbox-> stored only (default when nothing is configured) - fully offline
 
 Every message is ALWAYS stored in the notifications table, so the flow is
-demonstrable without any external service. Send failures are recorded, never
-raised into the request.
+demonstrable without any external service and delivery problems are recorded
+in the error column instead of breaking the prediction request.
 """
+import json
 import os
-import smtplib
+import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
-from email.mime.text import MIMEText
 
 from backend.app.extensions import db
 from backend.app.models import Notification
@@ -25,48 +25,75 @@ def _env(key: str) -> str | None:
     return v.strip() if v and v.strip() else None
 
 
-def smtp_configured() -> bool:
-    return bool(_env("SMTP_HOST") and _env("SMTP_FROM") and
-                (_env("SMTP_USER") is not None))
+def email_configured() -> bool:
+    return bool(_env("BREVO_API_KEY") and _env("BREVO_SENDER_EMAIL"))
 
 
 def sms_configured() -> bool:
-    return bool(_env("TWILIO_ACCOUNT_SID") and _env("TWILIO_AUTH_TOKEN")
-                and _env("TWILIO_FROM"))
+    return bool(_env("SMS_API_KEY"))
+
+
+def _http_error_detail(exc: urllib.error.HTTPError) -> str:
+    try:
+        return exc.read().decode(errors="replace")[:300]
+    except Exception:
+        return str(exc)
 
 
 def _send_email(destination: str, subject: str, body: str) -> tuple[str, str | None]:
-    host = _env("SMTP_HOST")
-    port = int(_env("SMTP_PORT") or 587)
-    user, password = _env("SMTP_USER"), _env("SMTP_PASSWORD")
-    sender = _env("SMTP_FROM")
-    msg = MIMEText(body)
-    msg["Subject"] = subject
-    msg["From"] = sender
-    msg["To"] = destination
-    with smtplib.SMTP(host, port, timeout=15) as server:
-        server.starttls()
-        if user:  # some relays need no auth
-            server.login(user, password or "")
-        server.sendmail(sender, [destination], msg.as_string())
-    return "sent", None
+    """Send via the Brevo transactional email API (developers.brevo.com).
+
+    BREVO_SENDER_EMAIL must be a sender verified in the Brevo account. If the
+    account uses IP whitelisting, requests from other IPs get a 401 whose body
+    explains how to authorize the address (Security > Authorised IPs).
+    """
+    payload = json.dumps({
+        "sender": {
+            "name": _env("BREVO_SENDER_NAME") or "WATERNET",
+            "email": _env("BREVO_SENDER_EMAIL"),
+        },
+        "to": [{"email": destination}],
+        "subject": subject,
+        "textContent": body,
+    }).encode()
+    req = urllib.request.Request(
+        "https://api.brevo.com/v3/smtp/email", data=payload, method="POST")
+    req.add_header("api-key", _env("BREVO_API_KEY") or "")
+    req.add_header("content-type", "application/json")
+    req.add_header("accept", "application/json")
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            if 200 <= resp.status < 300:
+                return "sent", None
+            return "failed", f"Brevo HTTP {resp.status}"
+    except urllib.error.HTTPError as exc:
+        return "failed", f"Brevo: {_http_error_detail(exc)}"
+    except Exception as exc:
+        return "failed", f"Brevo: {exc}"
 
 
 def _send_sms(destination: str, body: str) -> tuple[str, str | None]:
-    sid, token, sender = _env("TWILIO_ACCOUNT_SID"), _env("TWILIO_AUTH_TOKEN"), _env("TWILIO_FROM")
+    """Send via the TextBelt SMS API (textbelt.com).
+
+    TextBelt replies 200 with {"success": false, "error": "..."} for quota or
+    key problems, so the error text (e.g. 'Out of quota') is surfaced directly.
+    """
     data = urllib.parse.urlencode({
-        "To": destination, "From": sender, "Body": body,
+        "phone": destination,
+        "message": body[:480],  # keep well under TextBelt's hard message cap
+        "key": _env("SMS_API_KEY") or "",
     }).encode()
-    req = urllib.request.Request(
-        f"https://api.twilio.com/2010-04-01/Accounts/{sid}/Messages.json",
-        data=data, method="POST")
-    import base64
-    req.add_header("Authorization", "Basic " +
-                   base64.b64encode(f"{sid}:{token}".encode()).decode())
-    with urllib.request.urlopen(req, timeout=15) as resp:
-        if 200 <= resp.status < 300:
-            return "sent", None
-    return "failed", f"unexpected status from SMS gateway"
+    req = urllib.request.Request("https://textbelt.com/text", data=data, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            out = json.loads(resp.read().decode(errors="replace") or "{}")
+    except urllib.error.HTTPError as exc:
+        return "failed", f"TextBelt: {_http_error_detail(exc)}"
+    except Exception as exc:
+        return "failed", f"TextBelt: {exc}"
+    if out.get("success"):
+        return "sent", None
+    return "failed", f"TextBelt: {out.get('error', 'unknown error')}"
 
 
 def deliver(user, subject: str, body: str) -> Notification:
@@ -76,21 +103,15 @@ def deliver(user, subject: str, body: str) -> Notification:
     status, error = "outbox", None
 
     if channel == "email" and destination:
-        if smtp_configured():
-            try:
-                status, error = _send_email(destination, subject, body)
-            except Exception as exc:
-                status, error = "failed", f"SMTP: {exc}"
+        if email_configured():
+            status, error = _send_email(destination, subject, body)
         else:
-            status, error = "outbox", "SMTP not configured (see .env.example)"
+            status, error = "outbox", "Brevo not configured (see .env.example)"
     elif channel == "sms" and destination:
         if sms_configured():
-            try:
-                status, error = _send_sms(destination, body)
-            except Exception as exc:
-                status, error = "failed", f"SMS gateway: {exc}"
+            status, error = _send_sms(destination, body)
         else:
-            status, error = "outbox", "SMS gateway not configured (see .env.example)"
+            status, error = "outbox", "TextBelt not configured (see .env.example)"
 
     n = Notification(
         user_id=user.id, channel=channel, destination=destination,

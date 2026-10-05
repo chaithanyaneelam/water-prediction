@@ -34,9 +34,9 @@
     </select>
     <button class="btn" id="btn-register" style="margin-top:0.75rem;">Create account</button>
     <div id="register-errors" class="error-box hidden"></div>
-    <p class="note" style="margin-top:0.6rem;">Email needs SMTP settings in .env; SMS needs
-      an SMS gateway (e.g. Twilio). Without them, messages are stored in the
-      <a href="/notifications">outbox</a> instead - everything else works the same.</p>
+    <p class="note" style="margin-top:0.6rem;">Prediction messages are emailed via Brevo
+      or sent by SMS via TextBelt when API keys are set in .env. Without them,
+      messages are stored in the outbox instead - everything else works the same.</p>
   </div>
 </div>
 <script src="{{ url_for('static', filename='js/login.js') }}"></script>

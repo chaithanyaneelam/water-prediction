@@ -19,7 +19,7 @@ async function refreshNav() {
   }
   if (me.user) {
     authArea.innerHTML =
-      `<a href="/notifications" class="badge muted">${me.user.email || me.user.phone}</a>` +
+      `<span class="badge muted">${me.user.email || me.user.phone}</span>` +
       `<button class="btn secondary" id="btn-logout">Logout</button>`;
     document.getElementById("btn-logout").addEventListener("click", async () => {
       await api("/api/auth/logout", { method: "POST" });

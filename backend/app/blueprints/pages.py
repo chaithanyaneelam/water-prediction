@@ -47,8 +47,3 @@ def irrigation():
 @bp.get("/login")
 def login():
     return render_template("login.html")
-
-
-@bp.get("/notifications")
-def notifications():
-    return render_template("notifications.html")

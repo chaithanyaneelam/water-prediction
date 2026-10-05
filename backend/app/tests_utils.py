@@ -22,6 +22,11 @@ def app(tmp_path, monkeypatch):
     """App factory against a temp SQLite file DB."""
     monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path / 'test_api.db'}")
     app = create_app()
+    # Keep tests hermetic even when the developer's real .env has live keys:
+    # create_app() runs load_dotenv(), so the keys must be stripped AFTER that
+    # - delivery reads them at send time, so the suite uses the outbox path.
+    monkeypatch.delenv("BREVO_API_KEY", raising=False)
+    monkeypatch.delenv("SMS_API_KEY", raising=False)
     app.config.update(TESTING=True)
     yield app
 

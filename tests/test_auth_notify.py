@@ -91,6 +91,5 @@ def test_notifications_require_login(client):
     assert client.get("/api/auth/notifications").status_code == 401
 
 
-def test_login_pages_render(client):
-    for path in ("/login", "/notifications"):
-        assert client.get(path).status_code == 200
+def test_login_page_renders(client):
+    assert client.get("/login").status_code == 200
