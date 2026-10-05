@@ -50,12 +50,14 @@ def make_feature_frame(df: pd.DataFrame, feature_cols):
     return X
 
 
-def build_classifier_pipeline(estimator, with_smote: bool = False):
+def build_classifier_pipeline(estimator, with_smote: bool = False, smote_kwargs: dict | None = None):
     """Pipeline: impute -> clip outliers -> (optional SMOTE) -> estimator.
 
     SMOTE is applied only inside CV folds via imblearn's Pipeline; class_weight
-    is the simpler alternative for plain fits.
+    is the simpler alternative for plain fits. smote_kwargs lets callers tune
+    e.g. k_neighbors for tiny datasets (tests/smoke runs).
     """
+    smote_kwargs = smote_kwargs or {}
     if with_smote:
         from imblearn.pipeline import Pipeline as ImbPipeline
         from imblearn.over_sampling import SMOTE
@@ -65,7 +67,7 @@ def build_classifier_pipeline(estimator, with_smote: bool = False):
                 ("impute", MedianImputer()),
                 ("clip", IQRClipper()),
                 ("scale", StandardScalerSafe()),
-                ("smote", SMOTE(random_state=42)),
+                ("smote", SMOTE(random_state=42, **smote_kwargs)),
                 ("model", estimator),
             ]
         )

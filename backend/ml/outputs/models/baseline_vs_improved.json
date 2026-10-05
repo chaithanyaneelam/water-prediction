@@ -1,0 +1,54 @@
+{
+  "rows": [
+    {
+      "model": "RandomForest",
+      "variant": "baseline (raw data, simple split, median imputer fitted on train only)",
+      "accuracy": 1.0,
+      "precision_potable": 1.0,
+      "recall_potable": 1.0,
+      "f1_potable": 1.0,
+      "precision_not_potable": 1.0,
+      "recall_not_potable": 1.0,
+      "f1_not_potable": 1.0,
+      "roc_auc": 1.0,
+      "note": "No tuning, no SMOTE, no clipping/scaling. This is the floor to beat."
+    },
+    {
+      "model": "DecisionTree",
+      "variant": "baseline (raw data, simple split, median imputer fitted on train only)",
+      "accuracy": 1.0,
+      "precision_potable": 1.0,
+      "recall_potable": 1.0,
+      "f1_potable": 1.0,
+      "precision_not_potable": 1.0,
+      "recall_not_potable": 1.0,
+      "f1_not_potable": 1.0,
+      "roc_auc": 1.0,
+      "note": "No tuning, no SMOTE, no clipping/scaling. This is the floor to beat."
+    },
+    {
+      "model": "RandomForest",
+      "variant": "improved (pipeline: impute->clip->scale->SMOTE/class_weight, tuned inner CV)",
+      "accuracy": 1.0,
+      "f1_potable": 1.0,
+      "roc_auc": 1.0,
+      "note": "tuned: {'model__max_depth': '3', 'model__n_estimators': '10'}"
+    },
+    {
+      "model": "DecisionTree",
+      "variant": "improved (pipeline: impute->clip->scale->SMOTE/class_weight, tuned inner CV)",
+      "accuracy": 1.0,
+      "f1_potable": 1.0,
+      "roc_auc": 1.0,
+      "note": "tuned: {'model__max_depth': '2'}"
+    },
+    {
+      "model": "XGBoost",
+      "variant": "improved (pipeline: impute->clip->scale->SMOTE/class_weight, tuned inner CV)",
+      "accuracy": 0.6666666666666666,
+      "f1_potable": 0.0,
+      "roc_auc": 0.5,
+      "note": "tuned: {'model__max_depth': '2', 'model__n_estimators': '10'}"
+    }
+  ]
+}

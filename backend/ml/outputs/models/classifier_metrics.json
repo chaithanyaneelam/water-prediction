@@ -1,0 +1,143 @@
+{
+  "models": {
+    "RandomForest": {
+      "best_params": {
+        "model__max_depth": "3",
+        "model__n_estimators": "10"
+      },
+      "grid_cv_f1_best": 0.48888888888888893,
+      "cv_accuracy_mean": 0.611111111111111,
+      "cv_accuracy_std": 0.0785674201318386,
+      "cv_f1_mean": 0.48888888888888893,
+      "cv_f1_std": 0.3499559055116361,
+      "cv_roc_auc_mean": 0.5,
+      "cv_roc_auc_std": 0.408248290463863,
+      "test": {
+        "accuracy": 1.0,
+        "precision_potable": 1.0,
+        "recall_potable": 1.0,
+        "f1_potable": 1.0,
+        "precision_not_potable": 1.0,
+        "recall_not_potable": 1.0,
+        "f1_not_potable": 1.0,
+        "roc_auc": 1.0
+      },
+      "confusion_matrix": [
+        [
+          2,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "labels": [
+        "not potable (0)",
+        "potable (1)"
+      ]
+    },
+    "DecisionTree": {
+      "best_params": {
+        "model__max_depth": "2"
+      },
+      "grid_cv_f1_best": 0.8222222222222223,
+      "cv_accuracy_mean": 0.7777777777777777,
+      "cv_accuracy_std": 0.15713484026367724,
+      "cv_f1_mean": 0.8222222222222223,
+      "cv_f1_std": 0.13698697784375505,
+      "cv_roc_auc_mean": 0.75,
+      "cv_roc_auc_std": 0.2041241452319315,
+      "test": {
+        "accuracy": 1.0,
+        "precision_potable": 1.0,
+        "recall_potable": 1.0,
+        "f1_potable": 1.0,
+        "precision_not_potable": 1.0,
+        "recall_not_potable": 1.0,
+        "f1_not_potable": 1.0,
+        "roc_auc": 1.0
+      },
+      "confusion_matrix": [
+        [
+          2,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "labels": [
+        "not potable (0)",
+        "potable (1)"
+      ]
+    },
+    "XGBoost": {
+      "best_params": {
+        "model__max_depth": "2",
+        "model__n_estimators": "10"
+      },
+      "grid_cv_f1_best": 0.43333333333333335,
+      "cv_accuracy_mean": 0.5,
+      "cv_accuracy_std": 0.13608276348795434,
+      "cv_f1_mean": 0.43333333333333335,
+      "cv_f1_std": 0.32998316455372223,
+      "cv_roc_auc_mean": 0.5,
+      "cv_roc_auc_std": 0.0,
+      "test": {
+        "accuracy": 0.6666666666666666,
+        "precision_potable": 0.0,
+        "recall_potable": 0.0,
+        "f1_potable": 0.0,
+        "precision_not_potable": 0.6666666666666666,
+        "recall_not_potable": 1.0,
+        "f1_not_potable": 0.8,
+        "roc_auc": 0.5
+      },
+      "confusion_matrix": [
+        [
+          2,
+          0
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "labels": [
+        "not potable (0)",
+        "potable (1)"
+      ]
+    }
+  },
+  "baselines": [
+    {
+      "model": "RandomForest",
+      "variant": "baseline (raw data, simple split, median imputer fitted on train only)",
+      "accuracy": 1.0,
+      "precision_potable": 1.0,
+      "recall_potable": 1.0,
+      "f1_potable": 1.0,
+      "precision_not_potable": 1.0,
+      "recall_not_potable": 1.0,
+      "f1_not_potable": 1.0,
+      "roc_auc": 1.0,
+      "note": "No tuning, no SMOTE, no clipping/scaling. This is the floor to beat."
+    },
+    {
+      "model": "DecisionTree",
+      "variant": "baseline (raw data, simple split, median imputer fitted on train only)",
+      "accuracy": 1.0,
+      "precision_potable": 1.0,
+      "recall_potable": 1.0,
+      "f1_potable": 1.0,
+      "precision_not_potable": 1.0,
+      "recall_not_potable": 1.0,
+      "f1_not_potable": 1.0,
+      "roc_auc": 1.0,
+      "note": "No tuning, no SMOTE, no clipping/scaling. This is the floor to beat."
+    }
+  ],
+  "note": "CV numbers are 5-fold mean+-std on the training split; test numbers are one-shot on the untouched 20% split. Modest scores (~65-70%) are expected: features correlate only weakly with the potability label in this dataset."
+}

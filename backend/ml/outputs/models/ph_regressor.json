@@ -1,0 +1,38 @@
+{
+  "baseline": {
+    "cv": {
+      "mae": 0.4528,
+      "mae_std": 0.3228,
+      "r2": -1.1038,
+      "r2_std": 0.8978
+    },
+    "test": {
+      "mae": 0.55,
+      "rmse": 0.6759,
+      "r2": -0.5102
+    },
+    "note": "DummyRegressor(strategy='mean') fitted on training split only."
+  },
+  "model": {
+    "best_params": {
+      "model__max_depth": "3",
+      "model__n_estimators": "10"
+    },
+    "cv": {
+      "mae": 0.5867,
+      "mae_std": 0.2901,
+      "r2": -5.6409,
+      "r2_std": 7.4805
+    },
+    "test": {
+      "mae": 0.635,
+      "rmse": 0.6843,
+      "r2": -0.5479
+    }
+  },
+  "app_decision": "USE MEDIAN IMPUTATION for missing pH in the app (model does NOT clearly beat the baseline)",
+  "beats_baseline": false,
+  "n_train": 7,
+  "n_test": 2,
+  "honesty_note": "R2 near 0 means pH is essentially independent of the other parameters in this dataset - an honest, expected outcome."
+}
