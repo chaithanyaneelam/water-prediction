@@ -82,7 +82,7 @@ def _get_model():
     return _model
 
 
-def predict_irrigation(parsed: dict, source: str = "manual") -> dict:
+def predict_irrigation(parsed: dict, source: str = "manual", user_id: int | None = None) -> dict:
     """Rule-engine verdict (exact) + optional ML class cross-check."""
     ec = parsed["EC"]
     na, ca, mg = parsed["Na"], parsed["Ca"], parsed["Mg"]
@@ -105,7 +105,7 @@ def predict_irrigation(parsed: dict, source: str = "manual") -> dict:
         ml_proba = round(float(proba[idx]), 4)
 
     reading = IrrigationReading(
-        source=source,
+        source=source, user_id=user_id,
         **{f: parsed.get(f) for f in IRRIGATION_FIELDS},
         SAR=v["sar"], RSC=v["rsc"],
         ussl_class_rule=v["ussl_class"], rsc_class_rule=v["rsc_class"],

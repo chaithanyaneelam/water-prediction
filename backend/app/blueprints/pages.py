@@ -42,3 +42,13 @@ def explorer():
 @bp.get("/irrigation")
 def irrigation():
     return render_template("irrigation.html")
+
+
+@bp.get("/login")
+def login():
+    return render_template("login.html")
+
+
+@bp.get("/notifications")
+def notifications():
+    return render_template("notifications.html")

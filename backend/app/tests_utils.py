@@ -31,6 +31,17 @@ def client(app):
     return app.test_client()
 
 
+@pytest.fixture()
+def auth_client(client):
+    """Client logged in as a unique email user (predictions require login)."""
+    import uuid
+    email = f"u{uuid.uuid4().hex[:10]}@test.local"
+    r = client.post("/api/auth/register",
+                    json={"email": email, "password": "test-password-123"})
+    assert r.status_code == 200, r.get_json()
+    return client
+
+
 @pytest.fixture(scope="session")
 def smoke_models(tmp_path_factory, monkeypatch_session):
     """Train tiny models once for the whole test session (test fixture data only).

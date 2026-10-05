@@ -56,8 +56,8 @@ def test_label_columns_never_features():
         assert label not in IRRIGATION_FEATURES
 
 
-def test_api_predict_roundtrip(client, smoke_models):
-    res = client.post("/api/irrigation/predict", json=VALID)
+def test_api_predict_roundtrip(auth_client, smoke_models):
+    res = auth_client.post("/api/irrigation/predict", json=VALID)
     assert res.status_code == 200
     body = res.get_json()
     assert body["ok"] is True
@@ -66,19 +66,19 @@ def test_api_predict_roundtrip(client, smoke_models):
     assert isinstance(body["suitable"], bool)
 
     # Persisted and visible in summary
-    summary = client.get("/api/irrigation/summary").get_json()
+    summary = auth_client.get("/api/irrigation/summary").get_json()
     assert summary["stored"]["total"] >= 1
 
 
-def test_api_validation_missing_required(client):
-    res = client.post("/api/irrigation/predict",
+def test_api_validation_missing_required(auth_client):
+    res = auth_client.post("/api/irrigation/predict",
                       json={"EC": 1407, "Ca": 48, "Mg": 111, "HCO3": 240})
     assert res.status_code == 400
     assert any("Na" in e for e in res.get_json()["errors"])
 
 
-def test_api_validation_negative_ec(client):
-    res = client.post("/api/irrigation/predict",
+def test_api_validation_negative_ec(auth_client):
+    res = auth_client.post("/api/irrigation/predict",
                       json={"EC": -5, "Na": 95, "Ca": 48, "Mg": 111, "HCO3": 240})
     assert res.status_code == 400
     assert any("EC" in e for e in res.get_json()["errors"])

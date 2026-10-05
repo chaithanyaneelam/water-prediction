@@ -43,13 +43,14 @@ def treatment_suggestions(parsed: dict) -> list:
     return tips
 
 
-def predict_and_persist(parsed: dict, source: str = "manual") -> dict:
+def predict_and_persist(parsed: dict, source: str = "manual", user_id: int | None = None) -> dict:
     """Run all three models, store reading+prediction, return the API payload."""
     potability, proba = model_service.predict_potability(parsed)
     ph_value, ph_filled_by = model_service.predict_ph(parsed)
     anomaly_flag, anomaly_score, reasons = model_service.predict_anomaly(parsed)
 
-    reading = Reading(source=source, **{c: parsed.get(c) for c in FEATURE_COLS})
+    reading = Reading(source=source, user_id=user_id,
+                      **{c: parsed.get(c) for c in FEATURE_COLS})
     db.session.add(reading)
     db.session.flush()  # get reading.id
 

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Notifications - WATERNET{% endblock %}
+{% block content %}
+<h1>My prediction messages</h1>
+<p class="sub">Every prediction result is delivered to the channel you registered with.
+  If email/SMS is not configured yet, messages wait here in the outbox.</p>
+<div class="card">
+  <div class="table-wrap">
+    <table id="notif-table">
+      <thead><tr><th>#</th><th>When</th><th>Channel</th><th>To</th><th>Message</th>
+        <th>Status</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+{% endblock %}

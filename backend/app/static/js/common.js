@@ -73,10 +73,31 @@ function waternetInitNav() {
   });
 }
 
+/* Nav auth area: shows the logged-in user (or a Login link) on every page. */
+async function waternetInitAuthArea() {
+  const area = document.getElementById("auth-area");
+  if (!area) return;
+  try {
+    const me = await fetch("/api/auth/me").then(r => r.json());
+    if (me.user) {
+      area.innerHTML =
+        `<a href="/notifications" class="badge muted">${me.user.email || me.user.phone}</a>` +
+        `<button class="btn secondary" id="nav-logout">Logout</button>`;
+      document.getElementById("nav-logout").addEventListener("click", async () => {
+        await fetch("/api/auth/logout", { method: "POST" });
+        location.href = "/";
+      });
+    } else {
+      area.innerHTML = `<a class="btn secondary" href="/login">Login / Register</a>`;
+    }
+  } catch (e) { /* offline: leave empty */ }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   waternetInitTheme();
   waternetChartDefaults();
   waternetInitNav();
+  waternetInitAuthArea();
 });
 
 /* Small shared helpers for charts built on the page scripts. */

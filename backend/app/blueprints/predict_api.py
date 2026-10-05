@@ -1,6 +1,7 @@
-"""Prediction endpoints."""
+"""Prediction endpoints (login required - results go to the user's channel)."""
 from flask import Blueprint, jsonify, request
 
+from backend.app.blueprints.notify_hook import notify_result, require_user
 from backend.app.services.prediction_service import parse_bulk_csv, predict_and_persist
 from backend.app.validation import ValidationError, validate_reading
 
@@ -9,6 +10,9 @@ bp = Blueprint("predict", __name__, url_prefix="/api/predict")
 
 @bp.post("")
 def predict_single():
+    user, err = require_user()
+    if err is not None:
+        return err
     data = request.get_json(silent=True) or {}
     # 'source' is reserved for the demo simulator (source=simulated); the web
     # form never sends it, so normal use is always stored as 'manual'.
@@ -17,8 +21,9 @@ def predict_single():
         parsed = validate_reading(data)
     except ValidationError as exc:
         return jsonify({"ok": False, "errors": exc.errors}), 400
-    result = predict_and_persist(parsed, source=source)
+    result = predict_and_persist(parsed, source=source, user_id=user.id)
     result["ok"] = True
+    notify_result(user, result, kind="potability")
     return jsonify(result)
 
 

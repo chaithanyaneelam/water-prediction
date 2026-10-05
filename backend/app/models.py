@@ -1,7 +1,59 @@
-"""SQLAlchemy tables for WATERNET (section 7 of the spec)."""
+"""SQLAlchemy tables for WATERNET (section 7 of the spec + auth module)."""
+from datetime import datetime, timezone
+
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import check_password_hash, generate_password_hash
 
 db = SQLAlchemy()
+
+
+class User(db.Model):
+    """Account: registers with an email (notifications -> email) or a phone
+    number (notifications -> SMS). Password is stored hashed (never plain)."""
+    __tablename__ = "users"
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True)   # exactly one of email/phone
+    phone = db.Column(db.String(20), unique=True)    # E.164-ish, digits with optional +
+    password_hash = db.Column(db.String(255), nullable=False)
+    display_name = db.Column(db.String(80))
+    notify_channel = db.Column(db.String(10), nullable=False, default="outbox")  # email|sms|outbox
+    created_at = db.Column(db.DateTime, nullable=False,
+                           default=lambda: datetime.now(timezone.utc))
+
+    notifications = db.relationship("Notification", back_populates="user",
+                                    cascade="all, delete-orphan")
+
+    def set_password(self, password: str) -> None:
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password: str) -> bool:
+        return check_password_hash(self.password_hash, password)
+
+    @property
+    def destination(self) -> str | None:
+        """Where notifications go for this user."""
+        return self.email if self.notify_channel == "email" else (
+            self.phone if self.notify_channel == "sms" else None)
+
+
+class Notification(db.Model):
+    """One prediction message for one user (the notification outbox)."""
+    __tablename__ = "notifications"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    channel = db.Column(db.String(10), nullable=False)   # email|sms|outbox
+    destination = db.Column(db.String(150))
+    subject = db.Column(db.String(200))
+    body = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(20), nullable=False, default="outbox")  # sent|failed|outbox
+    error = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, nullable=False,
+                           default=lambda: datetime.now(timezone.utc))
+    sent_at = db.Column(db.DateTime)
+
+    user = db.relationship("User", back_populates="notifications")
 
 
 class WaterQualityDataset(db.Model):
@@ -28,6 +80,7 @@ class Reading(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
     source = db.Column(db.String(20), nullable=False, default="manual")  # manual|bulk|simulated
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))  # null = anonymous/simulated
     ph = db.Column(db.Float)
     Hardness = db.Column(db.Float, nullable=False)
     Solids = db.Column(db.Float, nullable=False)
@@ -80,6 +133,7 @@ class IrrigationReading(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
     source = db.Column(db.String(20), nullable=False, default="manual")
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))  # null = anonymous
 
     # inputs (mg/L unless noted)
     ph = db.Column(db.Float)

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Login - WATERNET{% endblock %}
+{% block content %}
+<h1>Account</h1>
+<p class="sub">Log in to run predictions. Prediction messages are sent to the email
+  address or phone number you registered with.</p>
+
+<div class="grid cols-2">
+  <div class="card">
+    <h2>Login</h2>
+    <label>Email or phone number</label>
+    <input id="l-identifier" placeholder="you@example.com or +919876543210">
+    <label style="margin-top:0.5rem;">Password</label>
+    <input id="l-password" type="password">
+    <button class="btn" id="btn-login" style="margin-top:0.75rem;">Login</button>
+    <div id="login-errors" class="error-box hidden"></div>
+  </div>
+
+  <div class="card">
+    <h2>Register</h2>
+    <label>Email (for email notifications)</label>
+    <input id="r-email" placeholder="you@example.com">
+    <label style="margin-top:0.5rem;">or phone (for SMS notifications)</label>
+    <input id="r-phone" placeholder="+919876543210">
+    <label style="margin-top:0.5rem;">Display name (optional)</label>
+    <input id="r-name" placeholder="Your name">
+    <label style="margin-top:0.5rem;">Password (min 8 characters)</label>
+    <input id="r-password" type="password">
+    <label style="margin-top:0.5rem;">Send prediction messages via</label>
+    <select id="r-channel">
+      <option value="email">Email</option>
+      <option value="sms">SMS</option>
+      <option value="outbox">Outbox only (no external service)</option>
+    </select>
+    <button class="btn" id="btn-register" style="margin-top:0.75rem;">Create account</button>
+    <div id="register-errors" class="error-box hidden"></div>
+    <p class="note" style="margin-top:0.6rem;">Email needs SMTP settings in .env; SMS needs
+      an SMS gateway (e.g. Twilio). Without them, messages are stored in the
+      <a href="/notifications">outbox</a> instead - everything else works the same.</p>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
+{% endblock %}
