@@ -1,1 +1,169 @@
-<!DOCTYPE html><html><head><title>WATERNET</title></head><body><h1>Model Comparison (placeholder)</h1></body></html>
+{% extends "base.html" %}
+{% block title %}Model Comparison - WATERNET{% endblock %}
+{% block content %}
+<h1>Model Comparison</h1>
+<p class="sub">All numbers come from saved training artifacts (honest CV + untouched test set). No hard-coded values.</p>
+<div id="cmp-hint" class="hint-box hidden"></div>
+
+<div class="tabs">
+  <button id="tab-clf" class="active">Classifier (graphs 7-17)</button>
+  <button id="tab-ph">pH regressor (graphs 18-20)</button>
+  <button id="tab-if">Anomaly - Isolation Forest (graphs 21-23)</button>
+</div>
+
+<!-- ======================= CLASSIFIER TAB ======================= -->
+<div id="pane-clf">
+  <div class="card">
+    <h2>Metric comparison</h2>
+    <div class="sub">Graph 7 - accuracy, precision, recall, F1 (both classes) and ROC-AUC per model, on the untouched test set</div>
+    <div class="chart-box tall"><canvas id="g7-metrics"></canvas></div>
+  </div>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <h2>Cross-validated accuracy (mean &plusmn; std)</h2>
+      <div class="sub">Graph 8 - 5-fold stratified CV on the training split; floating bars show &plusmn;1 std</div>
+      <div class="chart-box"><canvas id="g8-cv"></canvas></div>
+    </div>
+    <div class="card">
+      <h2>ROC curves</h2>
+      <div class="sub">Graph 10 - diagonal dashed line = random guessing</div>
+      <div class="chart-box"><canvas id="g10-roc"></canvas></div>
+    </div>
+    <div class="card">
+      <h2>Precision-Recall curves</h2>
+      <div class="sub">Graph 11</div>
+      <div class="chart-box"><canvas id="g11-pr"></canvas></div>
+    </div>
+    <div class="card">
+      <h2>Calibration (reliability) curve</h2>
+      <div class="sub">Graph 16 - Random Forest on the test set; dashed = perfectly calibrated</div>
+      <div class="chart-box"><canvas id="g16-calib"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Confusion matrices</h2>
+    <div class="sub">Graph 9 - rows = true class, columns = predicted class (test set)</div>
+    <div id="g9-cm" class="grid cols-3"></div>
+  </div>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <h2>Feature importance</h2>
+      <div class="sub">Graph 12 - Random Forest vs XGBoost importances (fitted on training data only)</div>
+      <div class="chart-box tall"><canvas id="g12-imp"></canvas></div>
+    </div>
+    <div class="card">
+      <h2>RFE ranking</h2>
+      <div class="sub">Graph 12b - Recursive Feature Elimination (rank 1 = kept)</div>
+      <div class="chart-box tall"><canvas id="g12-rfe"></canvas></div>
+    </div>
+    <div class="card">
+      <h2>Validation curves</h2>
+      <div class="sub">Graph 14 - training vs CV F1 as complexity grows (overfitting check)</div>
+      <div class="chart-box"><canvas id="g14-vc"></canvas></div>
+      <div class="sub" style="margin-top:0.5rem;">Parameter:
+        <select id="g14-param"><option value="n_estimators">n_estimators</option>
+          <option value="max_depth">max_depth</option></select></div>
+    </div>
+    <div class="card">
+      <h2>Threshold vs precision / recall / F1</h2>
+      <div class="sub">Graph 15 - from out-of-fold predictions on training data only</div>
+      <div class="chart-box"><canvas id="g15-thr"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <h2>Learning curve</h2>
+      <div class="sub">Graph 13 - matplotlib PNG from training (train vs CV score)</div>
+      <img id="g13-img" src="/api/plots/learning_curve.png" alt="learning curve"
+           style="width:100%; border-radius:8px;"
+           onerror="this.replaceWith(Object.assign(document.createElement('p'),{className:'note',textContent:'Learning-curve PNG not generated yet (appears after a full training run on the real dataset).'}))">
+    </div>
+    <div class="card">
+      <h2>Baseline vs improved pipeline</h2>
+      <div class="sub">Graph 17 - plain models on raw data vs the full tuned pipeline (test set)</div>
+      <div class="chart-box tall"><canvas id="g17-bvi"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Full metrics table (honest numbers)</h2>
+    <div class="sub">CV = 5-fold mean &plusmn; std on training split. Test = one-shot on the untouched 20%.</div>
+    <div class="table-wrap"><table id="metrics-table">
+      <thead><tr><th>Model</th><th>CV accuracy</th><th>CV F1</th><th>CV ROC-AUC</th>
+        <th>Test acc</th><th>Prec (pot.)</th><th>Rec (pot.)</th><th>F1 (pot.)</th>
+        <th>F1 (not)</th><th>Test ROC-AUC</th><th>Best params</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <p class="note">Scores around 65-70% accuracy are expected and honest: the nine chemical
+    parameters correlate only weakly with the potability label in this Kaggle dataset. Chasing
+    higher numbers here would mean overfitting or leakage, not better science.</p>
+  </div>
+</div>
+
+<!-- ======================= pH TAB ======================= -->
+<div id="pane-ph" class="hidden">
+  <div class="card">
+    <h2>pH regressor vs "predict the mean" baseline</h2>
+    <div class="sub">Graph 20 - MAE / RMSE / R&sup2; on the test set (lower MAE/RMSE is better; higher R&sup2; is better)</div>
+    <div class="chart-box"><canvas id="g20-phmetrics"></canvas></div>
+    <div id="ph-decision" class="hint-box"></div>
+  </div>
+  <div class="grid cols-2">
+    <div class="card">
+      <h2>Predicted vs actual pH</h2>
+      <div class="sub">Graph 18 - points on the dashed y=x line would be perfect predictions (test set)</div>
+      <div class="chart-box"><canvas id="g18-scatter"></canvas></div>
+    </div>
+    <div class="card">
+      <h2>Residual histogram</h2>
+      <div class="sub">Graph 19 - difference between actual and predicted pH (test set)</div>
+      <div class="chart-box"><canvas id="g19-resid"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>pH metrics table</h2>
+    <div class="table-wrap"><table id="ph-table">
+      <thead><tr><th>Model</th><th>CV MAE</th><th>CV R&sup2;</th><th>Test MAE</th>
+        <th>Test RMSE</th><th>Test R&sup2;</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <p class="note">R&sup2; near 0 means pH is essentially independent of the other eight
+    parameters in this dataset - that is an honest result, and exactly why the app falls back
+    to median imputation unless the model clearly beats the mean baseline.</p>
+  </div>
+</div>
+
+<!-- ======================= ANOMALY TAB ======================= -->
+<div id="pane-if" class="hidden">
+  <div class="card">
+    <h2>Why there is no accuracy here</h2>
+    <p class="note">The dataset has no "anomaly" labels, so accuracy/recall cannot be computed
+    honestly for anomaly detection. Instead we validate the Isolation Forest by (a) inspecting
+    the score distribution, (b) checking that injected faults in TEST FIXTURES are caught (see
+    the pytest suite), and (c) combining the model score with simple physical rule checks whose
+    reasons a human can read.</p>
+  </div>
+  <div class="grid cols-2">
+    <div class="card">
+      <h2>Anomaly score histogram</h2>
+      <div class="sub">Graph 21 - red line = Isolation Forest threshold (0 on the negated score)</div>
+      <div class="chart-box"><canvas id="g21-hist"></canvas></div>
+    </div>
+    <div class="card">
+      <h2>Anomalies by triggering reason</h2>
+      <div class="sub">Graph 23 - counts over the dataset (IF flag + physical rule violations)</div>
+      <div class="chart-box"><canvas id="g23-reasons"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>2D PCA scatter</h2>
+    <div class="sub">Graph 22 - held-out rows projected to 2D; anomalies highlighted</div>
+    <div class="chart-box tall"><canvas id="g22-pca"></canvas></div>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/comparison.js') }}"></script>
+{% endblock %}

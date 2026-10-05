@@ -1,0 +1,42 @@
+{# Base layout: navbar, theme toggle, shared assets. #}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}WATERNET{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='vendor/chart.umd.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="navbar">
+    <div class="brand">WATER<span>NET</span></div>
+    <nav>
+      <a href="/">Dashboard</a>
+      <a href="/predict">Predict</a>
+      <a href="/bulk">Bulk Upload</a>
+      <a href="/history">History</a>
+      <a href="/comparison">Model Comparison</a>
+      <a href="/explorer">Dataset Explorer</a>
+    </nav>
+    <div class="nav-spacer"></div>
+    <button id="theme-toggle" class="btn secondary" type="button">Dark mode</button>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+
+    <p class="footnote">
+      Guideline limits shown are typical WHO / BIS / EPA reference values and are for guidance
+      and charts only. Many samples in the training dataset exceed these limits yet are labelled
+      potable, so limits never create labels or model features. Predictions are statistical
+      estimates from the Kaggle Water Potability dataset and are not a substitute for
+      laboratory analysis.
+    </p>
+  </main>
+
+  <footer class="site">WATERNET - Water Quality Monitoring &amp; Potability Prediction (local, software-only demo)</footer>
+</body>
+</html>

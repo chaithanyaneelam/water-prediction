@@ -1,1 +1,68 @@
-<!DOCTYPE html><html><head><title>WATERNET</title></head><body><h1>Dataset Explorer (placeholder)</h1></body></html>
+{% extends "base.html" %}
+{% block title %}Dataset Explorer - WATERNET{% endblock %}
+{% block content %}
+<h1>Dataset Explorer</h1>
+<p class="sub">The real Kaggle Water Potability training data, imported into water_quality_dataset.</p>
+<div id="exp-hint" class="hint-box hidden"></div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <h2>Class balance</h2>
+    <div class="sub">Graph 1 - potable vs not potable</div>
+    <div class="chart-box"><canvas id="e1-class"></canvas></div>
+  </div>
+  <div class="card">
+    <h2>Missing values per column</h2>
+    <div class="sub">Graph 2 - NaN counts in the raw CSV</div>
+    <div class="chart-box"><canvas id="e2-missing"></canvas></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Feature distribution by potability</h2>
+  <div class="sub">Graph 3 - overlaid histograms (blue = potable, orange = not potable)</div>
+  <div style="max-width:280px;">
+    <select id="e3-feature"></select>
+  </div>
+  <div class="chart-box tall"><canvas id="e3-dist"></canvas></div>
+</div>
+
+<div class="card">
+  <h2>Correlation heatmap</h2>
+  <div class="sub">Graph 4 - Pearson correlation; weak correlation with Potability explains the honest ~65-70% accuracy ceiling</div>
+  <div class="table-wrap"><table id="e4-corr"></table></div>
+</div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <h2>Boxplots / outlier counts</h2>
+    <div class="sub">Graph 5 - matplotlib PNG with 1.5*IQR outlier counts</div>
+    <img src="/api/plots/boxplots.png" alt="boxplots" style="width:100%; border-radius:8px;"
+         onerror="this.replaceWith(Object.assign(document.createElement('p'),{className:'note',textContent:'Boxplot PNG appears after a full training run.'}))">
+  </div>
+  <div class="card">
+    <h2>Outlier counts per feature</h2>
+    <div class="sub">Graph 5b - same counts as data (1.5*IQR rule)</div>
+    <div class="chart-box"><canvas id="e5-outliers"></canvas></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Before vs after imputation</h2>
+  <div class="sub">Graph 6 - choose a column with missing values</div>
+  <div style="max-width:280px;">
+    <select id="e6-feature"></select>
+  </div>
+  <div class="chart-box"><canvas id="e6-imp"></canvas></div>
+</div>
+
+<div class="card">
+  <h2>Summary statistics</h2>
+  <div class="table-wrap"><table id="e-stats">
+    <thead><tr><th>Feature</th><th>Unit</th><th>Count</th><th>Missing</th><th>Mean</th>
+      <th>Std</th><th>Min</th><th>25%</th><th>50%</th><th>75%</th><th>Max</th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+</div>
+<script src="{{ url_for('static', filename='js/explorer.js') }}"></script>
+{% endblock %}

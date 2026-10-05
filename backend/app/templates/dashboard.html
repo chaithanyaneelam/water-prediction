@@ -1,1 +1,50 @@
-<!DOCTYPE html><html><head><title>WATERNET</title></head><body><h1>Dashboard (placeholder)</h1></body></html>
+{% extends "base.html" %}
+{% block title %}Dashboard - WATERNET{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+<p class="sub">Numbers and charts come from predictions stored in the local database.</p>
+
+<div class="grid cols-4">
+  <div class="card stat"><div class="num" id="stat-readings">-</div><div class="lbl">Total readings</div></div>
+  <div class="card stat"><div class="num" id="stat-potable">-</div><div class="lbl">% potable</div></div>
+  <div class="card stat"><div class="num" id="stat-anomaly">-</div><div class="lbl">% anomalies</div></div>
+  <div class="card stat"><div class="num" id="stat-notpotable">-</div><div class="lbl">% not potable</div></div>
+</div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <h2>Potable vs not potable</h2>
+    <div class="sub">Graph 24 - from stored predictions</div>
+    <div class="chart-box"><canvas id="ch-class"></canvas></div>
+  </div>
+  <div class="card">
+    <h2>Readings &amp; anomalies over time</h2>
+    <div class="sub">Graph 25 - daily counts, last 30 days</div>
+    <div class="chart-box"><canvas id="ch-time"></canvas></div>
+  </div>
+  <div class="card">
+    <h2>Parameter averages vs guideline limit</h2>
+    <div class="sub">Graph 26 - averages of stored readings; dashed line = guideline limit</div>
+    <div class="chart-box"><canvas id="ch-params"></canvas></div>
+  </div>
+  <div class="card">
+    <h2>pH distribution</h2>
+    <div class="sub">Graph 27 - 6.5-8.5 band highlighted</div>
+    <div class="chart-box"><canvas id="ch-ph"></canvas></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Recent predictions</h2>
+  <div class="table-wrap">
+    <table id="recent-table">
+      <thead><tr>
+        <th>#</th><th>When</th><th>Source</th><th>pH</th><th>Potability</th>
+        <th>Probability</th><th>Anomaly</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

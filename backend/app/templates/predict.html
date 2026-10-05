@@ -1,1 +1,48 @@
-<!DOCTYPE html><html><head><title>WATERNET</title></head><body><h1>Predict (placeholder)</h1></body></html>
+{% extends "base.html" %}
+{% block title %}Predict - WATERNET{% endblock %}
+{% block content %}
+<h1>Predict</h1>
+<p class="sub">Enter a water test. pH is optional - the saved pH model or median imputer fills it.</p>
+
+<div class="grid cols-2">
+  <div class="card">
+    <h2>Water test values</h2>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;">
+      <div><label>pH (optional)</label><input id="f-ph" type="number" step="0.1" min="0" max="14" placeholder="leave blank to impute"></div>
+      <div><label>Hardness (mg/L) *</label><input id="f-Hardness" type="number" step="0.1" required></div>
+      <div><label>Solids / TDS (mg/L) *</label><input id="f-Solids" type="number" step="1" required></div>
+      <div><label>Chloramines (mg/L) *</label><input id="f-Chloramines" type="number" step="0.1" required></div>
+      <div><label>Sulfate (mg/L) *</label><input id="f-Sulfate" type="number" step="1" required></div>
+      <div><label>Conductivity (uS/cm) *</label><input id="f-Conductivity" type="number" step="1" required></div>
+      <div><label>Organic carbon (mg/L) *</label><input id="f-Organic_carbon" type="number" step="0.1" required></div>
+      <div><label>Trihalomethanes (ug/L) *</label><input id="f-Trihalomethanes" type="number" step="1" required></div>
+      <div><label>Turbidity (NTU) *</label><input id="f-Turbidity" type="number" step="0.1" required></div>
+    </div>
+    <p class="note">* required. Ranges: pH 0-14, others &ge; 0. Missing values are handled by the saved imputer.</p>
+    <button class="btn" id="btn-predict">Predict</button>
+    <div id="predict-errors" class="error-box hidden"></div>
+  </div>
+
+  <div class="card">
+    <h2>Result</h2>
+    <div id="result-area" class="hint-box">Submit the form to see the prediction.</div>
+    <div id="result-charts" class="hidden">
+      <div class="grid cols-2">
+        <div>
+          <div class="sub" style="margin-top:0.75rem;">Potability probability (graph 29)</div>
+          <div class="chart-box short"><canvas id="ch-gauge"></canvas></div>
+        </div>
+        <div>
+          <div class="sub" style="margin-top:0.75rem;">This reading vs guideline limits (graph 28)</div>
+          <div class="chart-box short"><canvas id="ch-radar"></canvas></div>
+        </div>
+      </div>
+      <div class="sub" style="margin-top:0.75rem;">Parameters outside guideline limits (graph 30)</div>
+      <div class="chart-box short"><canvas id="ch-others"></canvas></div>
+      <div id="treatment-list"></div>
+      <p class="note">Radar values are normalized as value ÷ guideline limit (pH as distance from 7 in the 6.5-8.5 band). 1.0 = at the limit.</p>
+    </div>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/predict.js') }}"></script>
+{% endblock %}
