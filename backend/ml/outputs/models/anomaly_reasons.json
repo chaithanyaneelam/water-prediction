@@ -1,13 +1,9 @@
 {
   "labels": [
-    "Isolation Forest flag",
-    "pH -1.00 outside the physical range 0-14",
-    "negative value for ph"
+    "Isolation Forest flag"
   ],
   "values": [
-    5,
-    1,
-    1
+    552
   ],
   "note": "Counts over the full dataset. IF flag counts rows the model flags; rule counts are physical-check violations. A reading's 'reason' lists every rule that fired plus the IF flag."
 }

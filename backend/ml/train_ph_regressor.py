@@ -23,13 +23,11 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import KFold, GridSearchCV, cross_validate, train_test_split
 
 from backend.ml.config import (
-    FEATURE_COLS, LABEL_COL, OUTPUTS_DIR, PH_PREDICTOR_COLS, RANDOM_STATE,
+    FEATURE_COLS, LABEL_COL, PH_PREDICTOR_COLS, RANDOM_STATE,
 )
+from backend.ml import config as ml_config
 from backend.ml.preprocess import build_regressor_pipeline, make_feature_frame
 from backend.ml.make_dataset_plots import load_dataset_from_db
-
-MODELS_DIR = os.path.join(os.path.dirname(__file__), "saved_models")
-OUT_DIR = os.path.join(OUTPUTS_DIR, "models")
 
 
 def load_ph_frame(smoke: bool):
@@ -63,8 +61,9 @@ def _metrics(y_true, y_pred) -> dict:
 
 
 def _save(name: str, data: dict) -> None:
-    os.makedirs(OUT_DIR, exist_ok=True)
-    path = os.path.join(OUT_DIR, name)
+    out_dir = os.path.join(ml_config.OUTPUTS_DIR, "models")
+    os.makedirs(out_dir, exist_ok=True)
+    path = os.path.join(out_dir, name)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
     print(f"[saved] {path}")
@@ -164,10 +163,11 @@ def main(smoke: bool = False) -> dict:
     })
 
     import joblib
-    os.makedirs(MODELS_DIR, exist_ok=True)
-    joblib.dump(best, os.path.join(MODELS_DIR, "rf_ph_regressor.joblib"))
-    joblib.dump(baseline, os.path.join(MODELS_DIR, "mean_ph_baseline.joblib"))
-    print(f"[saved] models -> {MODELS_DIR}")
+    saved_dir = ml_config.SAVED_MODELS_DIR
+    os.makedirs(saved_dir, exist_ok=True)
+    joblib.dump(best, os.path.join(saved_dir, "rf_ph_regressor.joblib"))
+    joblib.dump(baseline, os.path.join(saved_dir, "mean_ph_baseline.joblib"))
+    print(f"[saved] models -> {saved_dir}")
     return {"rf_cv": rf_cv, "rf_test": rf_metrics_test,
             "base_cv": base_cv, "base_test": base_metrics_test}
 

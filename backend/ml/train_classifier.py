@@ -47,14 +47,13 @@ from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
 
-from backend.ml.config import FEATURE_COLS, LABEL_COL, RANDOM_STATE, OUTPUTS_DIR
+from backend.ml import config as ml_config
+from backend.ml.config import FEATURE_COLS, LABEL_COL, RANDOM_STATE
 from backend.ml.preprocess import (
     build_classifier_pipeline,
     make_feature_frame,
 )
-from backend.ml.make_dataset_plots import load_dataset_from_db, PLOT_DIR
-
-SMOTE_DIR = os.path.join(OUTPUTS_DIR, "models")
+from backend.ml.make_dataset_plots import load_dataset_from_db
 
 
 def _smote_kwargs(smoke: bool) -> dict:
@@ -133,8 +132,9 @@ def classification_metrics(y_true, y_pred, y_proba) -> dict:
 
 
 def _save(name: str, data: dict) -> None:
-    os.makedirs(SMOTE_DIR, exist_ok=True)
-    path = os.path.join(SMOTE_DIR, name)
+    out_dir = os.path.join(ml_config.OUTPUTS_DIR, "models")
+    os.makedirs(out_dir, exist_ok=True)
+    path = os.path.join(out_dir, name)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
     print(f"[saved] {path}")
@@ -349,10 +349,11 @@ def main(smoke: bool = False) -> dict:
 
     # Persist models with joblib.
     import joblib
-    os.makedirs(SAVED := os.path.join(os.path.dirname(__file__), "saved_models"), exist_ok=True)
+    saved_dir = ml_config.SAVED_MODELS_DIR
+    os.makedirs(saved_dir, exist_ok=True)
     for name, model in fitted.items():
-        joblib.dump(model, os.path.join(SAVED, f"{name.lower()}_potability.joblib"))
-    print(f"[saved] models -> {SAVED}")
+        joblib.dump(model, os.path.join(saved_dir, f"{name.lower()}_potability.joblib"))
+    print(f"[saved] models -> {saved_dir}")
 
     print("\n=== HONEST SUMMARY (test set, one-shot) ===")
     for name, s in models_summary.items():
@@ -377,7 +378,7 @@ def _save_learning_curve_png(lc: dict) -> None:
     ax.set_title("Learning curve - RandomForest (fitted on training split only)")
     ax.legend(); ax.grid(alpha=0.3)
     fig.tight_layout()
-    path = os.path.join(SMOTE_DIR, "learning_curve.png")
+    path = os.path.join(ml_config.OUTPUTS_DIR, "models", "learning_curve.png")
     fig.savefig(path, dpi=150); plt.close(fig)
     print(f"[saved] {path}")
 

@@ -20,16 +20,14 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.ensemble import IsolationForest
 
-from backend.ml.config import FEATURE_COLS, OUTPUTS_DIR, RANDOM_STATE
+from backend.ml import config as ml_config
+from backend.ml.config import FEATURE_COLS, RANDOM_STATE
 from backend.ml.preprocess import (
     IQRClipper, MedianImputer, StandardScalerSafe, make_feature_frame,
 )
 from sklearn.pipeline import Pipeline
 from backend.ml.make_dataset_plots import load_dataset_from_db
 from backend.ml.train_classifier import load_xy
-
-MODELS_DIR = os.path.join(os.path.dirname(__file__), "saved_models")
-OUT_DIR = os.path.join(OUTPUTS_DIR, "models")
 
 
 def rule_reasons(row) -> list:
@@ -60,8 +58,9 @@ def build_if_pipeline(contamination="auto") -> Pipeline:
 
 
 def _save(name: str, data: dict) -> None:
-    os.makedirs(OUT_DIR, exist_ok=True)
-    path = os.path.join(OUT_DIR, name)
+    out_dir = os.path.join(ml_config.OUTPUTS_DIR, "models")
+    os.makedirs(out_dir, exist_ok=True)
+    path = os.path.join(out_dir, name)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
     print(f"[saved] {path}")
@@ -123,9 +122,10 @@ def main(smoke: bool = False) -> dict:
     })
 
     import joblib
-    os.makedirs(MODELS_DIR, exist_ok=True)
-    joblib.dump(pipe, os.path.join(MODELS_DIR, "isolation_forest.joblib"))
-    print(f"[saved] model -> {MODELS_DIR}/isolation_forest.joblib")
+    saved_dir = ml_config.SAVED_MODELS_DIR
+    os.makedirs(saved_dir, exist_ok=True)
+    joblib.dump(pipe, os.path.join(saved_dir, "isolation_forest.joblib"))
+    print(f"[saved] model -> {saved_dir}/isolation_forest.joblib")
     return {"n_flagged": int(flags_eval.sum()), "n_eval": int(len(X_eval))}
 
 
