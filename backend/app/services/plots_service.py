@@ -33,7 +33,9 @@ def get_dataset_json(name: str):
 
 
 def png_path(name: str):
-    """Resolve a PNG name to a path, or None. Names are whitelisted."""
+    """Resolve a PNG name to a path, or None. Accepts 'boxplots' or 'boxplots.png'."""
+    if name.endswith(".png"):
+        name = name[:-4]
     candidates = [
         os.path.join(MODELS_DIR, f"{name}.png"),
         os.path.join(OUTPUTS_DIR, "dataset", f"{name}.png"),
