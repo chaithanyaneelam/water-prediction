@@ -67,10 +67,10 @@ Bulk Upload page to see the whole flow with 10 example readings.
 - Guideline limits (WHO/BIS/EPA) are **display-only** and editable in
   `backend/ml/config.py`. They never create labels or features. Many potable-labelled
   samples exceed them (e.g. Solids averages ~22,000 mg/L).
-- Prediction notifications are emailed via the Brevo API or sent by SMS via
-  TextBelt when API keys are configured in `.env`; without keys they are kept
-  in the internal outbox (see `.env.example`). No IoT, no Docker/cloud, no
-  synthetic training data.
+- Accounts register with an email address; prediction reports are emailed via
+  the Brevo API (TextBelt SMS remains supported for delivery when a channel is
+  configured). Without keys, reports are kept in the internal outbox
+  (see `.env.example`). No IoT, no Docker/cloud, no synthetic training data.
   The tiny CSV in `tests/fixtures/` is **test-only** and never used for training.
 
 ## Structure

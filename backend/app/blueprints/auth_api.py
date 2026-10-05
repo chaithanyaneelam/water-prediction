@@ -12,7 +12,7 @@ bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
 def _user_json(u):
     return {
-        "id": u.id, "email": u.email, "phone": u.phone,
+        "id": u.id, "email": u.email,
         "display_name": u.display_name, "notify_channel": u.notify_channel,
         "destination": u.destination,
     }
@@ -23,7 +23,7 @@ def register_route():
     data = request.get_json(silent=True) or {}
     try:
         user = register(
-            email=data.get("email"), phone=data.get("phone"),
+            email=data.get("email"),
             password=data.get("password"), display_name=data.get("display_name"),
             preferred_channel=data.get("preferred_channel"),
         )

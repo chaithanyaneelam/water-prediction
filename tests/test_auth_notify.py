@@ -1,4 +1,4 @@
-"""Auth + notification tests: register (email/phone), login, protected predictions,
+"""Auth + notification tests: register (email), login, protected predictions,
 outbox delivery, message content."""
 import pytest
 
@@ -11,12 +11,8 @@ VALID = {
 }
 
 
-def _register(client, suffix, **kw):
-    payload = dict(password="test-password-123", **kw)
-    if suffix.endswith("@x.com"):
-        payload["email"] = suffix
-    else:
-        payload["phone"] = suffix
+def _register(client, email, **kw):
+    payload = dict(email=email, password="test-password-123", **kw)
     return client.post("/api/auth/register", json=payload)
 
 
@@ -30,14 +26,14 @@ def test_register_with_email_and_login(client):
     assert r.status_code == 200
 
 
-def test_register_with_phone_and_login(client):
-    r = _register(client, "+919876543210")
-    assert r.status_code == 200
-    assert r.get_json()["user"]["notify_channel"] == "sms"
-    client.post("/api/auth/logout")
-    r = client.post("/api/auth/login",
-                    json={"identifier": "+919876543210", "password": "test-password-123"})
-    assert r.status_code == 200
+def test_register_requires_email_phone_not_accepted(client):
+    # Phone-only registration is no longer supported (email-only auth).
+    r = client.post("/api/auth/register",
+                    json={"phone": "+919876543210", "password": "test-password-123"})
+    assert r.status_code == 400
+    # An email is mandatory.
+    r = client.post("/api/auth/register", json={"password": "test-password-123"})
+    assert r.status_code == 400
 
 
 def test_register_rejects_bad_identifier_and_short_password(client):
@@ -47,12 +43,21 @@ def test_register_rejects_bad_identifier_and_short_password(client):
     r = client.post("/api/auth/register", json={"email": "b@x.com", "password": "short"})
     assert r.status_code == 400
     r = client.post("/api/auth/register", json={"password": "longenough1"})
-    assert r.status_code == 400  # neither email nor phone
+    assert r.status_code == 400  # no email given
 
 
 def test_register_duplicate_email_rejected(client):
     assert _register(client, "dup@x.com").status_code == 200
     assert _register(client, "dup@x.com").status_code == 400
+
+
+def test_login_rejects_phone_identifier(client):
+    # Accounts are email-only: a phone number can no longer log in.
+    assert _register(client, "phoneless@x.com").status_code == 200
+    client.post("/api/auth/logout")
+    r = client.post("/api/auth/login",
+                    json={"identifier": "+919876543210", "password": "test-password-123"})
+    assert r.status_code == 401
 
 
 def test_predict_requires_login(client, smoke_models):
@@ -76,15 +81,15 @@ def test_predict_stores_notification_for_email_user(auth_client, smoke_models):
     assert f"{100 * body['probability']:.1f}%" in n["body"]
 
 
-def test_irrigation_predict_sends_sms_channel_notification(client, smoke_models):
+def test_irrigation_predict_sends_email_notification(client, smoke_models):
     r = client.post("/api/auth/register",
-                    json={"phone": "+919800000001", "password": "test-password-123"})
+                    json={"email": "irr-user@x.com", "password": "test-password-123"})
     assert r.status_code == 200
     res = client.post("/api/irrigation/predict", json={
         "EC": 1407, "Na": 95, "Ca": 48, "Mg": 111.826, "HCO3": 240, "CO3": 0})
     assert res.status_code == 200
     notifs = client.get("/api/auth/notifications").get_json()["items"]
-    assert any(n["channel"] == "sms" and "C3S1" in n["subject"] for n in notifs)
+    assert any(n["channel"] == "email" and "C3S1" in n["subject"] for n in notifs)
 
 
 def test_notifications_require_login(client):

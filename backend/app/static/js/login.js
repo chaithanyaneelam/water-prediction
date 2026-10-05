@@ -19,7 +19,7 @@ async function refreshNav() {
   }
   if (me.user) {
     authArea.innerHTML =
-      `<span class="badge muted">${me.user.email || me.user.phone}</span>` +
+      `<span class="badge muted">${me.user.email || "account"}</span>` +
       `<button class="btn secondary" id="btn-logout">Logout</button>`;
     document.getElementById("btn-logout").addEventListener("click", async () => {
       await api("/api/auth/logout", { method: "POST" });
@@ -50,7 +50,6 @@ document.getElementById("btn-register").addEventListener("click", async () => {
       method: "POST", headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
         email: document.getElementById("r-email").value,
-        phone: document.getElementById("r-phone").value,
         display_name: document.getElementById("r-name").value,
         password: document.getElementById("r-password").value,
         preferred_channel: document.getElementById("r-channel").value,

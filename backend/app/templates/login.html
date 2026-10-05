@@ -2,14 +2,14 @@
 {% block title %}Login - WATERNET{% endblock %}
 {% block content %}
 <h1>Account</h1>
-<p class="sub">Log in to run predictions. Prediction messages are sent to the email
-  address or phone number you registered with.</p>
+<p class="sub">Log in to run predictions. Prediction reports are sent to the email
+  address you registered with.</p>
 
 <div class="grid cols-2">
   <div class="card">
     <h2>Login</h2>
-    <label>Email or phone number</label>
-    <input id="l-identifier" placeholder="you@example.com or +919876543210">
+    <label>Email</label>
+    <input id="l-identifier" placeholder="you@example.com">
     <label style="margin-top:0.5rem;">Password</label>
     <input id="l-password" type="password">
     <button class="btn" id="btn-login" style="margin-top:0.75rem;">Login</button>
@@ -18,25 +18,22 @@
 
   <div class="card">
     <h2>Register</h2>
-    <label>Email (for email notifications)</label>
+    <label>Email (reports are sent here)</label>
     <input id="r-email" placeholder="you@example.com">
-    <label style="margin-top:0.5rem;">or phone (for SMS notifications)</label>
-    <input id="r-phone" placeholder="+919876543210">
     <label style="margin-top:0.5rem;">Display name (optional)</label>
     <input id="r-name" placeholder="Your name">
     <label style="margin-top:0.5rem;">Password (min 8 characters)</label>
     <input id="r-password" type="password">
     <label style="margin-top:0.5rem;">Send prediction messages via</label>
     <select id="r-channel">
-      <option value="email">Email</option>
-      <option value="sms">SMS</option>
+      <option value="email">Email (default)</option>
       <option value="outbox">Outbox only (no external service)</option>
     </select>
     <button class="btn" id="btn-register" style="margin-top:0.75rem;">Create account</button>
     <div id="register-errors" class="error-box hidden"></div>
-    <p class="note" style="margin-top:0.6rem;">Prediction messages are emailed via Brevo
-      or sent by SMS via TextBelt when API keys are set in .env. Without them,
-      messages are stored in the outbox instead - everything else works the same.</p>
+    <p class="note" style="margin-top:0.6rem;">Prediction reports are emailed via Brevo
+      when the API key is set in .env. Without it, reports are stored in the
+      outbox instead - everything else works the same.</p>
   </div>
 </div>
 <script src="{{ url_for('static', filename='js/login.js') }}"></script>

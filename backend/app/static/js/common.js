@@ -81,7 +81,7 @@ async function waternetInitAuthArea() {
     const me = await fetch("/api/auth/me").then(r => r.json());
     if (me.user) {
       area.innerHTML =
-        `<span class="badge muted">${me.user.email || me.user.phone}</span>` +
+        `<span class="badge muted">${me.user.email || "account"}</span>` +
         `<button class="btn secondary" id="nav-logout">Logout</button>`;
       document.getElementById("nav-logout").addEventListener("click", async () => {
         await fetch("/api/auth/logout", { method: "POST" });

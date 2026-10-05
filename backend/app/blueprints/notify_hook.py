@@ -12,7 +12,7 @@ def require_user():
         return None, (jsonify({
             "ok": False,
             "errors": ["login required to run predictions - register with an "
-                       "email (results by email) or a phone number (results by SMS)"]
+                       "email address and results are sent to it after each prediction"]
         }), 401)
     return user, None
 
