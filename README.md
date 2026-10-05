@@ -28,6 +28,9 @@ python -m pytest tests/ -q                 # 26 tests: API, validation, leakage,
 python -m backend.ml.train_all --smoke     # end-to-end pipeline check on a tiny test-only fixture
 ```
 
+Sample bulk-upload file: **`sample_bulk_upload.csv`** (project root) - upload it on the
+Bulk Upload page to see the whole flow with 10 example readings.
+
 ## Pages
 
 | Page | What it shows |
