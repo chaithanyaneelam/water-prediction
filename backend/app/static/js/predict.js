@@ -31,6 +31,36 @@ document.getElementById("btn-predict").addEventListener("click", async () => {
   }
 });
 
+/* Manual (re-)send of the last prediction's report to the user's email/SMS. */
+let _lastReadingId = null;
+
+function updateSendStatus(html) {
+  const row = document.getElementById("send-report-row");
+  if (!row) return;
+  const old = document.getElementById("send-report-status");
+  if (old) old.remove();
+  const holder = document.createElement("div");
+  holder.id = "send-report-status";
+  holder.innerHTML = html || "";
+  row.after(holder);
+}
+
+async function sendReport() {
+  if (_lastReadingId == null) return;
+  const btn = document.getElementById("btn-send-report");
+  btn.disabled = true;
+  btn.textContent = "Sending…";
+  try {
+    const resp = await api(`/api/predict/${_lastReadingId}/send`, { method: "POST" });
+    updateSendStatus(wnNotifyLine(resp.notification));
+  } catch (err) {
+    updateSendStatus(`<p class="note">Could not send: ${wnEsc(err.message)}</p>`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "📤 Send report";
+  }
+}
+
 function renderResult(r) {
   document.getElementById("result-area").className = "";
   document.getElementById("result-area").innerHTML = `
@@ -129,7 +159,15 @@ function renderResult(r) {
        ${tips.map(t => `<li>${t}</li>`).join("")}</ul></div>`
     : `<p class="note">No treatment suggestions - all values within guideline limits.</p>`;
 
-  // Delivery confirmation: email for email users, SMS for phone users.
-  document.getElementById("treatment-list")
-    .insertAdjacentHTML("beforeend", wnNotifyLine(r.notification));
+  // Manual send button + delivery confirmation (email for email users,
+  // SMS for phone users). The report is auto-sent after the prediction;
+  // the button re-sends it on demand.
+  _lastReadingId = r.reading_id;
+  const tl = document.getElementById("treatment-list");
+  tl.insertAdjacentHTML("beforeend", `<div id="send-report-row" style="margin-top:0.75rem;">
+    <button class="btn secondary" id="btn-send-report" type="button">📤 Send report</button>
+    <span class="note">sends this report to your registered email or phone</span>
+  </div>`);
+  document.getElementById("btn-send-report").addEventListener("click", sendReport);
+  updateSendStatus(wnNotifyLine(r.notification));
 }

@@ -84,6 +84,34 @@ def predict_and_persist(parsed: dict, source: str = "manual", user_id: int | Non
     }
 
 
+def rebuild_result(reading_id: int, user_id: int) -> dict | None:
+    """Rebuild the API payload for a stored reading (for re-sending reports).
+
+    Returns None when the reading does not exist, has no prediction yet, or
+    belongs to a different user - callers answer 404 in that case.
+    """
+    reading = db.session.get(Reading, reading_id)
+    if reading is None or reading.user_id != user_id or reading.prediction is None:
+        return None
+    p = reading.prediction
+    parsed = {c: getattr(reading, c) for c in FEATURE_COLS}
+    return {
+        "reading_id": reading.id,
+        "potability": p.potability,
+        "potability_label": "potable" if p.potability == 1 else "not potable",
+        "probability": p.probability,
+        "ph": p.ph_predicted,
+        "ph_filled_by": p.ph_filled_by,
+        "anomaly": {
+            "flag": p.is_anomaly,
+            "score": p.anomaly_score,
+            "reason": p.anomaly_reason or "none",
+        },
+        "guideline_hits": model_service.guideline_hits(parsed),
+        "treatment": treatment_suggestions(parsed),
+    }
+
+
 def parse_bulk_csv(content: str, source: str = "bulk") -> dict:
     """Parse + validate + predict a CSV. Returns results, row errors, and summary."""
     try:

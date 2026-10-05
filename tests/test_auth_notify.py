@@ -91,5 +91,30 @@ def test_notifications_require_login(client):
     assert client.get("/api/auth/notifications").status_code == 401
 
 
+def test_send_report_resends_prediction(auth_client, smoke_models):
+    res = auth_client.post("/api/predict", json=VALID)
+    rid = res.get_json()["reading_id"]
+    r = auth_client.post(f"/api/predict/{rid}/send")
+    assert r.status_code == 200
+    body = r.get_json()
+    assert body["ok"] is True
+    assert body["notification"]["channel"] == "email"
+    assert body["notification"]["status"] == "outbox"  # no provider keys in tests
+    notifs = auth_client.get("/api/auth/notifications").get_json()["items"]
+    assert len(notifs) == 2  # auto-send + manual resend
+
+
+def test_send_report_missing_or_foreign_reading(auth_client, smoke_models):
+    # unknown reading id
+    assert auth_client.post("/api/predict/999999/send").status_code == 404
+    # another user's reading is invisible too (registering logs the new user in)
+    res = auth_client.post("/api/predict", json=VALID)
+    rid = res.get_json()["reading_id"]
+    r = auth_client.post("/api/auth/register",
+                         json={"email": "second-user@x.com", "password": "test-password-123"})
+    assert r.status_code == 200
+    assert auth_client.post(f"/api/predict/{rid}/send").status_code == 404
+
+
 def test_login_page_renders(client):
     assert client.get("/login").status_code == 200

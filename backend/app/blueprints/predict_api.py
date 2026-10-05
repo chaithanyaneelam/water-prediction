@@ -2,7 +2,11 @@
 from flask import Blueprint, jsonify, request
 
 from backend.app.blueprints.notify_hook import notify_result, require_user
-from backend.app.services.prediction_service import parse_bulk_csv, predict_and_persist
+from backend.app.services.prediction_service import (
+    parse_bulk_csv,
+    predict_and_persist,
+    rebuild_result,
+)
 from backend.app.validation import ValidationError, validate_reading
 
 bp = Blueprint("predict", __name__, url_prefix="/api/predict")
@@ -25,6 +29,22 @@ def predict_single():
     result["ok"] = True
     notify_result(user, result, kind="potability")
     return jsonify(result)
+
+
+@bp.post("/<int:reading_id>/send")
+def send_report(reading_id: int):
+    """(Re-)send the stored report for one reading to the user's channel:
+    email for users registered with an email, SMS for phone users."""
+    user, err = require_user()
+    if err is not None:
+        return err
+    result = rebuild_result(reading_id, user.id)
+    if result is None:
+        return jsonify({"ok": False,
+                        "errors": ["report not found (or it belongs to another user)"]}), 404
+    notify_result(user, result, kind="potability")
+    return jsonify({"ok": True, "reading_id": reading_id,
+                    "notification": result.get("notification")})
 
 
 @bp.post("/bulk")
