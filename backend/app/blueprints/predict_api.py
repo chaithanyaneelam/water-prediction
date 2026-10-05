@@ -10,11 +10,14 @@ bp = Blueprint("predict", __name__, url_prefix="/api/predict")
 @bp.post("")
 def predict_single():
     data = request.get_json(silent=True) or {}
+    # 'source' is reserved for the demo simulator (source=simulated); the web
+    # form never sends it, so normal use is always stored as 'manual'.
+    source = data.get("source") if data.get("source") in ("manual", "simulated") else "manual"
     try:
         parsed = validate_reading(data)
     except ValidationError as exc:
         return jsonify({"ok": False, "errors": exc.errors}), 400
-    result = predict_and_persist(parsed, source="manual")
+    result = predict_and_persist(parsed, source=source)
     result["ok"] = True
     return jsonify(result)
 

@@ -22,7 +22,7 @@ class MedianImputer(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         X = pd.DataFrame(X).copy()
-        return X.fillna(self.medians_)
+        return X.fillna(self.medians_).infer_objects(copy=False)
 
 
 class IQRClipper(BaseEstimator, TransformerMixin):
@@ -44,7 +44,9 @@ class IQRClipper(BaseEstimator, TransformerMixin):
 
 def make_feature_frame(df: pd.DataFrame, feature_cols):
     """Return X (features only) and ensure the label never sneaks in."""
-    X = df[feature_cols].copy()
+    if "Potability" in list(feature_cols):
+        raise AssertionError("Leakage guard: Potability must never be in features")
+    X = df[list(feature_cols)].copy()
     if "Potability" in X.columns:
         raise AssertionError("Leakage guard: Potability must never be in features")
     return X
