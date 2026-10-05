@@ -1,10 +1,8 @@
 # Model Details & Honest Results
 
-> Numbers below come from the smoke-mode verification run (test-only fixture, 13 rows)
-> because the real CSV had not been placed at the time of writing. Running
-> `python -m backend.ml.train_all` on the real dataset overwrites every artifact and
-> this page's tables should be regenerated from `outputs/models/*.json`. The structure
-> of the analysis is identical.
+> Numbers below are from the REAL run on the genuine Kaggle dataset
+> (3,276 rows; imported 2026-10-05; artifacts in `outputs/models/*.json`).
+> Re-running `python -m backend.ml.train_all` reproduces them (seeded).
 
 ## Training protocol (no leakage)
 
@@ -35,20 +33,46 @@ Fill after the real run (`outputs/models/classifier_metrics.json`, `ph_regressor
 
 | Model | CV accuracy | CV F1 | CV ROC-AUC | Test acc | F1 pot. | F1 not pot. | Test ROC-AUC |
 |---|---|---|---|---|---|---|---|
-| RandomForest | - | - | - | - | - | - | - |
-| DecisionTree | - | - | - | - | - | - | - |
-| XGBoost | - | - | - | - | - | - | - |
+| RandomForest (SMOTE in-fold) | 0.673 ± 0.019 | 0.554 | 0.693 | **0.652** | 0.506 | 0.732 | **0.672** |
+| DecisionTree (class_weight) | 0.570 ± 0.029 | 0.507 | 0.591 | 0.584 | 0.488 | 0.650 | 0.587 |
+| XGBoost (SMOTE in-fold) | 0.636 ± 0.021 | 0.534 | 0.675 | 0.627 | 0.503 | 0.701 | 0.655 |
+| Baseline RF (raw, no pipeline) | - | - | - | 0.663 | - | - | - |
+| Baseline DT (raw, no pipeline) | - | - | - | 0.596 | - | - | - |
 
-| pH model | CV MAE | Test MAE | Test RMSE | Test R² |
-|---|---|---|---|---|
-| Mean baseline | - | - | - | - |
-| RandomForest (tuned) | - | - | - | - |
+Best RF params: `n_estimators=200, max_depth=20, min_samples_leaf=1`.
+Best DT params: `max_depth=None, min_samples_leaf=10` (class_weight=balanced).
+Best XGB params: `n_estimators=200, max_depth=5, learning_rate=0.1`.
 
-**Why scores are modest:** the nine measured chemical parameters correlate only weakly
-with the potability label (see the Dataset Explorer correlation heatmap). The Kaggle
-labels come from varied real-world sources; with these features alone, ~65-70% accuracy
-is the realistic ceiling. Anything dramatically higher would signal leakage or overfitting,
-both of which are explicitly tested against in this project.
+**Honest reading:** Random Forest wins (65.2% accuracy, AUC 0.672). Note the raw baseline
+RF already scores 66.3% - on this weak-signal dataset the full pipeline does not add much,
+and we report that openly rather than tuning on the test set to fake an improvement.
+Recall on the potable class is the weak spot (0.457 for RF): the model is conservative
+about calling water potable.
+
+| pH model | CV MAE | CV R² | Test MAE | Test RMSE | Test R² |
+|---|---|---|---|---|---|
+| Mean baseline | 1.240 ± 0.052 | -0.002 ± 0.002 | 1.222 | 1.557 | -0.002 |
+| RandomForest (tuned) | 1.234 ± 0.042 | 0.001 ± 0.022 | 1.233 | 1.570 | -0.018 |
+
+**App decision (computed at training time): USE MEDIAN IMPUTATION** - the tuned model does
+NOT clearly beat the predict-the-mean baseline (CV MAE 1.234 vs 1.240, test R² negative).
+This is the honest, expected outcome: pH is essentially independent of the other eight
+parameters in this dataset. Trained on the 2,784 rows with 0 < pH < 14 (492 dropped: 491
+missing + 1 pH=0 extreme).
+
+**Why scores are modest:** exactly as anticipated - the nine measured chemical parameters
+correlate only weakly with the potability label (see the Dataset Explorer correlation
+heatmap: all |r| < 0.1 vs Potability). The Kaggle labels come from varied real-world
+sources; with these features alone, ~65-70% accuracy is the realistic ceiling. Anything
+dramatically higher would signal leakage or overfitting, both of which are explicitly
+tested against in this project.
+
+## Isolation Forest (real run)
+
+Fitted on the 2,620-row training split only; evaluated on the untouched 656-row test
+split: **104/656 rows (~15.9%) flagged** as statistical outliers, with the threshold and
+full score distribution shown in graph 21. Rules (pH range, negatives, extreme turbidity)
+combine with the IF flag to produce the human-readable reason shown on the Predict page.
 
 ## Graph descriptions (as implemented)
 
