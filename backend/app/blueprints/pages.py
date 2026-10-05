@@ -5,6 +5,11 @@ bp = Blueprint("pages", __name__)
 
 
 @bp.get("/")
+def home():
+    return render_template("home.html")
+
+
+@bp.get("/dashboard")
 def dashboard():
     return render_template("dashboard.html")
 

@@ -143,3 +143,23 @@ input:focus, select:focus { outline: 2px solid var(--primary); border-color: tra
 footer.site {
   text-align: center; color: var(--muted); font-size: 0.8rem; padding: 1.5rem;
 }
+
+/* ---------- home page ---------- */
+.hero {
+  display: flex; gap: 2rem; align-items: center; justify-content: space-between;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, var(--primary-soft) 0%, var(--surface) 60%);
+}
+.hero h1 {
+  margin: 0; font-size: 2.6rem; letter-spacing: 1px; color: var(--primary);
+}
+.hero .tagline { max-width: 560px; color: var(--muted); margin: 0.6rem 0 1rem; }
+.hero-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.hero-stats { display: flex; gap: 2rem; }
+.feature h3 { margin: 0 0 0.4rem; font-size: 1rem; }
+.feature p { margin: 0 0 0.5rem; font-size: 0.9rem; color: var(--muted); }
+.code {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 0.9rem 1.1rem; font-size: 0.85rem; overflow-x: auto; margin: 0;
+  font-family: Consolas, "Courier New", monospace; color: var(--text);
+}
