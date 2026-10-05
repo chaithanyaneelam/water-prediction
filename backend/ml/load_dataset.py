@@ -76,7 +76,8 @@ def data_quality_report(df: pd.DataFrame) -> dict:
     ph_lo, ph_hi = PHYSICAL_RANGES["ph"]
     ph = df["ph"].dropna()
     report["ph_impossible"] = int(((ph < ph_lo) | (ph > ph_hi)).sum())
-    report["ph_extremes_0_or_14"] = int(((ph == 0) | (ph == 14)).sum())
+    # Type-agnostic equality: values may be stored as int 0/14 or float 0.0/14.0.
+    report["ph_extremes_0_or_14"] = int(ph.isin([0, 14]).sum())
     report["class_balance"] = {
         "potable": int((df[LABEL_COL] == 1).sum()),
         "not_potable": int((df[LABEL_COL] == 0).sum()),
