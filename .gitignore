@@ -1,0 +1,12 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+*.db
+backend/ml/saved_models/*.joblib
+backend/ml/outputs/*.png
+backend/ml/outputs/*.json
+backend/ml/outputs/*.csv
+.freebuff/
