@@ -101,6 +101,29 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* Small shared helpers for charts built on the page scripts. */
+function wnEsc(s) {
+  return String(s ?? "").replace(/[&<>"']/g,
+    c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+
+/* Delivery confirmation line shown after a prediction button is clicked.
+   `n` is the `notification` summary attached by the backend to the result. */
+function wnNotifyLine(n) {
+  if (!n) return "";
+  const dest = wnEsc(n.destination);
+  const via = n.channel === "sms" ? "SMS" : "email";
+  const icon = n.channel === "sms" ? "📱" : "📧";
+  if (n.status === "sent") {
+    return `<p class="note" style="margin-top:0.6rem;">${icon} Result sent by ${via} to <b>${dest}</b>.</p>`;
+  }
+  if (n.status === "failed") {
+    return `<p class="note" style="margin-top:0.6rem;">${icon} Could not send by ${via} to
+      <b>${dest}</b> - ${wnEsc(n.error || "unknown error")}. The message is stored and can be retried.</p>`;
+  }
+  return `<p class="note" style="margin-top:0.6rem;">${icon} Result for <b>${dest}</b> kept in the
+    outbox (delivery service not configured).</p>`;
+}
+
 function doughnut(canvasId, labels, values, colors) {
   wnDestroy(canvasId);
   const ctx = document.getElementById(canvasId);

@@ -128,4 +128,8 @@ function renderResult(r) {
     ? `<div class="hint-box"><b>Suggested treatment:</b><ul style="margin:0.4rem 0 0 1.2rem;">
        ${tips.map(t => `<li>${t}</li>`).join("")}</ul></div>`
     : `<p class="note">No treatment suggestions - all values within guideline limits.</p>`;
+
+  // Delivery confirmation: email for email users, SMS for phone users.
+  document.getElementById("treatment-list")
+    .insertAdjacentHTML("beforeend", wnNotifyLine(r.notification));
 }

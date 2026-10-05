@@ -115,6 +115,9 @@ function renderIrrigation(r) {
   document.getElementById("irr-detail").classList.remove("hidden");
   const ec = parseFloat(document.getElementById("i-EC").value);
   drawUssl({ec: ec, sar: r.sar});
+
+  // Delivery confirmation: email for email users, SMS for phone users.
+  area.insertAdjacentHTML("beforeend", wnNotifyLine(r.notification));
 }
 
 loadIrrigationSummary();
