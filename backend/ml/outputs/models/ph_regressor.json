@@ -15,7 +15,7 @@
   },
   "model": {
     "best_params": {
-      "model__max_depth": "3",
+      "model__max_depth": "5",
       "model__n_estimators": "10"
     },
     "cv": {
@@ -25,9 +25,9 @@
       "r2_std": 7.4805
     },
     "test": {
-      "mae": 0.635,
-      "rmse": 0.6843,
-      "r2": -0.5479
+      "mae": 0.64,
+      "rmse": 0.6871,
+      "r2": -0.5607
     }
   },
   "app_decision": "USE MEDIAN IMPUTATION for missing pH in the app (model does NOT clearly beat the baseline)",

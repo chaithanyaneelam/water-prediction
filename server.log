@@ -10,3 +10,4 @@ Press CTRL+C to quit
 127.0.0.1 - - [05/Oct/2026 15:52:48] "POST /api/predict HTTP/1.1" 200 -
 127.0.0.1 - - [05/Oct/2026 15:52:49] "POST /api/predict HTTP/1.1" 400 -
 127.0.0.1 - - [05/Oct/2026 15:52:49] "GET /api/readings?source=simulated HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 15:54:07] "POST /api/predict HTTP/1.1" 200 -
