@@ -25,7 +25,10 @@ def predict_single():
         parsed = validate_reading(data)
     except ValidationError as exc:
         return jsonify({"ok": False, "errors": exc.errors}), 400
-    result = predict_and_persist(parsed, source=source, user_id=user.id)
+    try:
+        result = predict_and_persist(parsed, source=source, user_id=user.id)
+    except RuntimeError as exc:
+        return jsonify({"ok": False, "errors": [str(exc)]}), 503
     result["ok"] = True
     notify_result(user, result, kind="potability")
     return jsonify(result)

@@ -54,6 +54,14 @@ class ModelService:
             "ph_app_decision": "model" if self.ph_beats_baseline else "median",
         }
 
+    def ensure_loaded(self) -> None:
+        """Raise a clear error when deployment artifacts were not generated."""
+        if not self.loaded:
+            raise RuntimeError(
+                "Prediction models are unavailable. Run the model training "
+                "commands during deployment before serving predictions."
+            )
+
     # ------------------------------------------------------------------ helpers
     def _frame(self, parsed: dict) -> pd.DataFrame:
         row = {c: parsed.get(c) for c in FEATURE_COLS}
@@ -61,6 +69,7 @@ class ModelService:
 
     def predict_ph(self, parsed: dict):
         """Predict pH when missing. Returns (value, filled_by in {model,median,none})."""
+        self.ensure_loaded()
         if parsed.get("ph") is not None:
             return parsed["ph"], "none"
         if self.ph_beats_baseline:
@@ -70,12 +79,14 @@ class ModelService:
         return round(float(self.ph_median), 2), "median"
 
     def predict_potability(self, parsed: dict):
+        self.ensure_loaded()
         X = self._frame(parsed)
         proba = float(self.models["classifier"].predict_proba(X)[0][1])
         return int(proba >= 0.5), proba
 
     def predict_anomaly(self, parsed: dict):
         """IF score/flag + physical rule checks -> (flag, score, reasons list)."""
+        self.ensure_loaded()
         X = self._frame(parsed)
         score = float(-self.models["anomaly"].decision_function(X)[0])
         flag = bool(self.models["anomaly"].predict(X)[0] == -1)
