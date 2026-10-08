@@ -1,0 +1,7 @@
+{
+  "n_checked_sar": 1089,
+  "sar_agreement_5pct": 0.9963,
+  "n_checked_ussl": 1085,
+  "ussl_rule_agreement": 0.9171,
+  "note": "Rule engine = standard formulas (SAR from Na/Ca/Mg; USSL from EC and SAR). Near-perfect agreement with the dataset's own columns validates the implementation."
+}

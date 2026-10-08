@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bulk Upload - WATERNET</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="/static/vendor/chart.umd.js"></script>
+  <script src="/static/js/common.js"></script>
+  
+</head>
+<body>
+  <header class="navbar">
+    <a class="brand" href="/" style="text-decoration:none;">WATER<span>NET</span></a>
+    <nav>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/predict">Predict</a>
+      <a href="/bulk">Bulk Upload</a>
+      <a href="/history">History</a>
+      <a href="/comparison">Model Comparison</a>
+      <a href="/explorer">Dataset Explorer</a>
+      <a href="/irrigation">Irrigation</a>
+    </nav>
+    <div class="nav-spacer"></div>
+    <div id="auth-area" style="display:flex;gap:0.5rem;align-items:center;"></div>
+    <button id="theme-toggle" class="btn secondary" type="button">Dark mode</button>
+  </header>
+
+  <main class="container">
+    
+<h1>Bulk Upload</h1>
+<p class="sub">Upload a CSV with the 9 parameter columns. Every row is validated, predicted and stored.</p>
+
+<div class="card">
+  <h2>Upload CSV</h2>
+  <input type="file" id="csv-file" accept=".csv,text/csv">
+  <p class="note">First row must be the headers: ph, Hardness, Solids, Chloramines, Sulfate,
+    Conductivity, Organic_carbon, Trihalomethanes, Turbidity. pH may be blank; the other
+    eight are required. A sample file is included in the project: sample_bulk_upload.csv.</p>
+  <button class="btn" id="btn-upload">Predict all rows</button>
+  <div id="bulk-errors" class="error-box hidden"></div>
+</div>
+
+<div id="bulk-results" class="hidden">
+  <div class="grid cols-3">
+    <div class="card"><h2>Split</h2><div class="chart-box short"><canvas id="ch-bulk-class"></canvas></div></div>
+    <div class="card"><h2>Anomalies</h2><div class="chart-box short"><canvas id="ch-bulk-anom"></canvas></div></div>
+    <div class="card"><h2>Processing</h2>
+      <div class="stat" style="padding-top:1rem;">
+        <div class="num" id="bulk-total">-</div><div class="lbl">rows received</div>
+        <div class="num" id="bulk-ok">-</div><div class="lbl">predicted</div>
+        <div class="num" id="bulk-fail">-</div><div class="lbl">failed validation</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Results</h2>
+    <button class="btn secondary" id="btn-download">Download results as CSV</button>
+    <div class="table-wrap" style="margin-top:0.75rem;">
+      <table id="bulk-table">
+        <thead><tr><th>Row</th><th>pH</th><th>Hardness</th><th>Solids</th><th>Chloramines</th>
+          <th>Sulfate</th><th>Cond.</th><th>Org.C</th><th>THM</th><th>Turb.</th>
+          <th>Potability</th><th>Prob.</th><th>Anomaly</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script src="/static/js/bulk.js"></script>
+
+
+    <p class="footnote">
+      Guideline limits shown are typical WHO / BIS / EPA reference values and are for guidance
+      and charts only. Many samples in the training dataset exceed these limits yet are labelled
+      potable, so limits never create labels or model features. Predictions are statistical
+      estimates from the Kaggle Water Potability dataset and are not a substitute for
+      laboratory analysis.
+    </p>
+  </main>
+
+  <footer class="site">WATERNET - Water Quality Monitoring &amp; Potability Prediction (local, software-only demo)</footer>
+</body>
+</html>

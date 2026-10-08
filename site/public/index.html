@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WATERNET - Water Quality Monitoring & Potability Prediction</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="/static/vendor/chart.umd.js"></script>
+  <script src="/static/js/common.js"></script>
+  
+</head>
+<body>
+  <header class="navbar">
+    <a class="brand" href="/" style="text-decoration:none;">WATER<span>NET</span></a>
+    <nav>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/predict">Predict</a>
+      <a href="/bulk">Bulk Upload</a>
+      <a href="/history">History</a>
+      <a href="/comparison">Model Comparison</a>
+      <a href="/explorer">Dataset Explorer</a>
+      <a href="/irrigation">Irrigation</a>
+    </nav>
+    <div class="nav-spacer"></div>
+    <div id="auth-area" style="display:flex;gap:0.5rem;align-items:center;"></div>
+    <button id="theme-toggle" class="btn secondary" type="button">Dark mode</button>
+  </header>
+
+  <main class="container">
+    
+
+<section class="card hero">
+  <div class="hero-text">
+    <h1>WATERNET</h1>
+    <p class="tagline">Water quality monitoring and potability &amp; irrigation-suitability
+      prediction - trained on real Kaggle datasets, running entirely on your machine.</p>
+    <div class="hero-actions">
+      <a class="btn" href="/predict">Predict water quality</a>
+      <a class="btn secondary" href="/irrigation">Check irrigation suitability</a>
+      <a class="btn secondary" href="/dashboard">Open the dashboard</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="num" id="h-readings">-</div><div class="lbl">predictions stored</div></div>
+    <div class="stat"><div class="num" id="h-models">-</div><div class="lbl">trained models</div></div>
+    <div class="stat"><div class="num" id="h-samples">6,366</div><div class="lbl">real training samples</div></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>What this project does</h2>
+  <div class="grid cols-3 features">
+    <div class="feature">
+      <h3>Drinking water potability</h3>
+      <p>Random Forest / Decision Tree / XGBoost classifiers predict whether water is
+      potable, with probability, anomaly flagging (Isolation Forest + physical rules)
+      and a predicted pH when unmeasured.</p>
+      <a href="/predict">Open Predict &rarr;</a>
+    </div>
+    <div class="feature">
+      <h3>Irrigation suitability</h3>
+      <p>The standard USSL (salinity &times; sodium) and RSC classifications computed
+      exactly by formula, cross-checked by a Random Forest trained on 1,090 real
+      groundwater samples, with the classic USSL diagram.</p>
+      <a href="/irrigation">Open Irrigation &rarr;</a>
+    </div>
+    <div class="feature">
+      <h3>Single or bulk</h3>
+      <p>One reading at a time, or upload a CSV of many - every row is validated,
+      predicted, stored and exportable.</p>
+      <a href="/bulk">Open Bulk Upload &rarr;</a>
+    </div>
+    <div class="feature">
+      <h3>Honest model comparison</h3>
+      <p>RF vs Decision Tree vs XGBoost with untouched test sets, CV mean&plusmn;std,
+      confusion matrices, ROC/PR/calibration curves - and the honest baselines
+      next to them. No inflated numbers, ever.</p>
+      <a href="/comparison">Open Model Comparison &rarr;</a>
+    </div>
+    <div class="feature">
+      <h3>Dataset explorer</h3>
+      <p>Class balance, missing values, distributions by class, correlation heatmap,
+      boxplots and before/after imputation - all from the real training data.</p>
+      <a href="/explorer">Open Dataset Explorer &rarr;</a>
+    </div>
+    <div class="feature">
+      <h3>History &amp; exports</h3>
+      <p>Every prediction is stored: search, filter, sort, export CSV, and live
+      dashboard charts over time.</p>
+      <a href="/history">Open History &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<div class="grid cols-2">
+  <section class="card">
+    <h2>The two real datasets</h2>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Dataset</th><th>Rows</th><th>Source</th><th>Trained models</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><a href="/explorer">Water Potability</a></td>
+          <td>3,276</td>
+          <td>Kaggle "Water Potability"</td>
+          <td>RF, DT, XGB (potability) &middot; RF regressor (pH) &middot; Isolation Forest (anomaly)</td>
+        </tr>
+        <tr>
+          <td><a href="/irrigation">Telangana groundwater</a></td>
+          <td>1,090</td>
+          <td>Kaggle groundwater quality (India)</td>
+          <td>RF (USSL class) + exact rule engine (SAR/RSC)</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="note">Everything runs locally: SQLite database, Flask backend, vanilla
+    JS frontend. One command trains, one command serves.</p>
+  </section>
+
+  <section class="card">
+    <h2>Current honest performance</h2>
+    <div class="table-wrap">
+      <table id="perf-table">
+        <thead><tr><th>Task</th><th>Model</th><th>Score (untouched test set)</th></tr></thead>
+        <tbody>
+          <tr><td>Potability</td><td>Random Forest</td><td id="perf-pot">-</td></tr>
+          <tr><td>Potability</td><td>Decision Tree</td><td id="perf-dt">-</td></tr>
+          <tr><td>Potability</td><td>XGBoost</td><td id="perf-xgb">-</td></tr>
+          <tr><td>Irrigation (USSL)</td><td>Random Forest</td><td id="perf-irr">-</td></tr>
+          <tr><td>pH regression</td><td>vs mean baseline</td><td id="perf-ph">-</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Potability accuracy sits around 65% by design: the nine chemical
+    parameters barely correlate with the label in this dataset. We report what is true
+    rather than tuning on the test set.</p>
+  </section>
+</div>
+
+<section class="card">
+  <h2>Run it yourself</h2>
+  <pre class="code">python -m backend.ml.train_all            # train everything (potability + graphs)
+python -m backend.ml.load_irrigation_dataset   # import irrigation data (file included)
+python -m backend.ml.train_irrigation          # train irrigation model
+python run.py                             # serve the whole site</pre>
+</section>
+<script src="/static/js/home.js"></script>
+
+
+    <p class="footnote">
+      Guideline limits shown are typical WHO / BIS / EPA reference values and are for guidance
+      and charts only. Many samples in the training dataset exceed these limits yet are labelled
+      potable, so limits never create labels or model features. Predictions are statistical
+      estimates from the Kaggle Water Potability dataset and are not a substitute for
+      laboratory analysis.
+    </p>
+  </main>
+
+  <footer class="site">WATERNET - Water Quality Monitoring &amp; Potability Prediction (local, software-only demo)</footer>
+</body>
+</html>

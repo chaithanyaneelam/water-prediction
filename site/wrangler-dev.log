@@ -1,0 +1,65 @@
+
+ ⛅️ wrangler 4.148.0
+────────────────────
+Your Worker has access to the following bindings:
+Binding                    Resource         Mode
+env.DB (waternet)          D1 Database      local
+env.ASSETS                 Assets           local
+
+⎔ Starting local server...
+[wrangler:info] Ready on http://127.0.0.1:8787
+[wrangler:info] GET /api/health 200 OK (21ms)
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mworker error: Error: D1_ERROR: no such table: users: SQLITE_ERROR[0m
+
+      at D1DatabaseSessionAlwaysPrimary._sendOrThrow (cloudflare-internal:d1-api:188:19)
+      at null.<anonymous> (async cloudflare-internal:d1-api:440:19)
+      ... 2 lines matching cause stack trace ...
+      at async drainBody (file:///C:/Users/nspri/AppData/Local/npm-cache/_npx/d77349f55c2be1c0/node_modules/wrangler/templates/middleware/middleware-ensure-req-body-drained.ts:5:10) {
+    [cause]: Error: no such table: users: SQLITE_ERROR
+        at D1DatabaseSessionAlwaysPrimary._sendOrThrow (cloudflare-internal:d1-api:189:24)
+        at null.<anonymous> (async cloudflare-internal:d1-api:440:19)
+        at async Object.fetch (file:///C:/Users/nspri/Desktop/WATER_PREDICTION/site/src/worker.js:349:24)
+        at async jsonError (file:///C:/Users/nspri/AppData/Local/npm-cache/_npx/d77349f55c2be1c0/node_modules/wrangler/templates/middleware/middleware-miniflare3-json-error.ts:22:10)
+        at async drainBody (file:///C:/Users/nspri/AppData/Local/npm-cache/_npx/d77349f55c2be1c0/node_modules/wrangler/templates/middleware/middleware-ensure-req-body-drained.ts:5:10)
+  }
+
+
+[wrangler:info] POST /api/auth/register 500 Internal Server Error (404ms)
+[wrangler:info] GET /api/auth/me 200 OK (8ms)
+[wrangler:info] POST /api/predict 401 Unauthorized (6ms)
+[wrangler:info] POST /api/auth/register 200 OK (39ms)
+[wrangler:info] POST /api/predict 401 Unauthorized (18ms)
+[wrangler:info] GET /api/stats 200 OK (162ms)
+[wrangler:info] GET /api/readings 200 OK (39ms)
+[wrangler:info] GET /api/auth/me 200 OK (23ms)
+⎔ Reloading local server...
+⎔ Local server updated and ready
+[wrangler:info] POST /api/auth/register 200 OK (111ms)
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mworker error: ReferenceError: xgbPredictProba is not defined[0m
+
+      at predictPotability (file:///C:/Users/nspri/Desktop/WATER_PREDICTION/site/src/worker.js:152:17)
+      at Object.fetch (file:///C:/Users/nspri/Desktop/WATER_PREDICTION/site/src/worker.js:408:37)
+      at async jsonError (file:///C:/Users/nspri/AppData/Local/npm-cache/_npx/d77349f55c2be1c0/node_modules/wrangler/templates/middleware/middleware-miniflare3-json-error.ts:22:10)
+      at async drainBody (file:///C:/Users/nspri/AppData/Local/npm-cache/_npx/d77349f55c2be1c0/node_modules/wrangler/templates/middleware/middleware-ensure-req-body-drained.ts:5:10)
+
+
+[wrangler:info] POST /api/predict 500 Internal Server Error (177ms)
+[wrangler:info] GET /api/auth/me 200 OK (12ms)
+⎔ Reloading local server...
+⎔ Local server updated and ready
+[wrangler:info] POST /api/predict 200 OK (324ms)
+[wrangler:info] GET /api/stats 200 OK (169ms)
+[wrangler:info] POST /api/predict/bulk 200 OK (69ms)
+[wrangler:info] POST /api/irrigation/predict 200 OK (33ms)
+[wrangler:info] GET /api/models/metrics 200 OK (188ms)
+[wrangler:info] GET / 200 OK (22ms)
+[wrangler:info] GET /dashboard 200 OK (10ms)
+[wrangler:info] GET /predict 200 OK (19ms)
+[wrangler:info] GET /bulk 200 OK (25ms)
+[wrangler:info] GET /history 200 OK (20ms)
+[wrangler:info] GET /comparison 200 OK (24ms)
+[wrangler:info] GET /explorer 200 OK (23ms)
+[wrangler:info] GET /irrigation 200 OK (12ms)
+[wrangler:info] GET /login 200 OK (22ms)
+[wrangler:warn] The Workers runtime crashed unexpectedly and is being restarted (crash #1). Any additional runtime output above may indicate the cause.
+[wrangler:info] Updated and ready on http://127.0.0.1:8787

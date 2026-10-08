@@ -10,3 +10,7 @@ backend/ml/outputs/*.png
 backend/ml/outputs/*.json
 backend/ml/outputs/*.csv
 .freebuff/
+
+# Wrangler local dev state
+site/.wrangler/
+site/wrangler-dev.log

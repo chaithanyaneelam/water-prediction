@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login - WATERNET</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="/static/vendor/chart.umd.js"></script>
+  <script src="/static/js/common.js"></script>
+  
+</head>
+<body>
+  <header class="navbar">
+    <a class="brand" href="/" style="text-decoration:none;">WATER<span>NET</span></a>
+    <nav>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/predict">Predict</a>
+      <a href="/bulk">Bulk Upload</a>
+      <a href="/history">History</a>
+      <a href="/comparison">Model Comparison</a>
+      <a href="/explorer">Dataset Explorer</a>
+      <a href="/irrigation">Irrigation</a>
+    </nav>
+    <div class="nav-spacer"></div>
+    <div id="auth-area" style="display:flex;gap:0.5rem;align-items:center;"></div>
+    <button id="theme-toggle" class="btn secondary" type="button">Dark mode</button>
+  </header>
+
+  <main class="container">
+    
+<h1>Account</h1>
+<p class="sub">Log in to run predictions and keep your reading history.</p>
+
+<div class="grid cols-2">
+  <div class="card">
+    <h2>Login</h2>
+    <label>Email</label>
+    <input id="l-identifier" placeholder="you@example.com">
+    <label style="margin-top:0.5rem;">Password</label>
+    <input id="l-password" type="password">
+    <button class="btn" id="btn-login" style="margin-top:0.75rem;">Login</button>
+    <div id="login-errors" class="error-box hidden"></div>
+  </div>
+
+  <div class="card">
+    <h2>Register</h2>
+    <label>Email (reports are sent here)</label>
+    <input id="r-email" placeholder="you@example.com">
+    <label style="margin-top:0.5rem;">Display name (optional)</label>
+    <input id="r-name" placeholder="Your name">
+    <label style="margin-top:0.5rem;">Password (min 6 characters)</label>
+    <input id="r-password" type="password">
+    <button class="btn" id="btn-register" style="margin-top:0.75rem;">Create account</button>
+    <div id="register-errors" class="error-box hidden"></div>
+    <p class="note" style="margin-top:0.6rem;">Hosted demo: your account and prediction history are
+      stored in the site database. Email delivery is not part of the hosted demo.</p>
+  </div>
+</div>
+<script src="/static/js/login.js"></script>
+
+
+    <p class="footnote">
+      Guideline limits shown are typical WHO / BIS / EPA reference values and are for guidance
+      and charts only. Many samples in the training dataset exceed these limits yet are labelled
+      potable, so limits never create labels or model features. Predictions are statistical
+      estimates from the Kaggle Water Potability dataset and are not a substitute for
+      laboratory analysis.
+    </p>
+  </main>
+
+  <footer class="site">WATERNET - Water Quality Monitoring &amp; Potability Prediction (local, software-only demo)</footer>
+</body>
+</html>

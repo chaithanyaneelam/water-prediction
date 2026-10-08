@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Irrigation - WATERNET</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="/static/vendor/chart.umd.js"></script>
+  <script src="/static/js/common.js"></script>
+  
+</head>
+<body>
+  <header class="navbar">
+    <a class="brand" href="/" style="text-decoration:none;">WATER<span>NET</span></a>
+    <nav>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/predict">Predict</a>
+      <a href="/bulk">Bulk Upload</a>
+      <a href="/history">History</a>
+      <a href="/comparison">Model Comparison</a>
+      <a href="/explorer">Dataset Explorer</a>
+      <a href="/irrigation">Irrigation</a>
+    </nav>
+    <div class="nav-spacer"></div>
+    <div id="auth-area" style="display:flex;gap:0.5rem;align-items:center;"></div>
+    <button id="theme-toggle" class="btn secondary" type="button">Dark mode</button>
+  </header>
+
+  <main class="container">
+    
+<h1>Irrigation Suitability</h1>
+<p class="sub">Standard USSL / RSC formulas compute the verdict exactly; an ML model
+(RF, 1,090 real Telangana groundwater samples) cross-checks the class.</p>
+<div id="irr-hint" class="hint-box hidden"></div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <h2>Water analysis (ions in mg/L)</h2>
+    <div class="form-grid two">
+      <div><label>Electrical conductivity EC (µS/cm) *</label><input id="i-EC" type="number" step="1" required></div>
+      <div><label>Sodium Na (mg/L) *</label><input id="i-Na" type="number" step="0.1" required></div>
+      <div><label>Calcium Ca (mg/L) *</label><input id="i-Ca" type="number" step="0.1" required></div>
+      <div><label>Magnesium Mg (mg/L) *</label><input id="i-Mg" type="number" step="0.1" required></div>
+      <div><label>Bicarbonate HCO3 (mg/L) *</label><input id="i-HCO3" type="number" step="0.1" required></div>
+      <div><label>Carbonate CO3 (mg/L, often 0)</label><input id="i-CO3" type="number" step="0.1"></div>
+      <div><label>pH (optional)</label><input id="i-ph" type="number" step="0.01"></div>
+      <div><label>TDS (optional, mg/L)</label><input id="i-TDS" type="number" step="1"></div>
+      <div><label>Chloride Cl (optional)</label><input id="i-Cl" type="number" step="0.1"></div>
+      <div><label>Sulfate SO4 (optional)</label><input id="i-SO4" type="number" step="0.1"></div>
+      <div><label>Nitrate NO3 (optional)</label><input id="i-NO3" type="number" step="0.1"></div>
+      <div><label>Fluoride F (optional)</label><input id="i-F" type="number" step="0.01"></div>
+      <div><label>Potassium K (optional)</label><input id="i-K" type="number" step="0.1"></div>
+      <div><label>Total hardness TH (optional)</label><input id="i-TH" type="number" step="0.1"></div>
+    </div>
+    <button class="btn" id="btn-irrigation">Check irrigation suitability</button>
+    <div id="irr-errors" class="error-box hidden"></div>
+  </div>
+
+  <div class="card">
+    <h2>Result</h2>
+    <div id="irr-result" class="hint-box">Enter EC, Na, Ca, Mg and HCO3 to see the verdict.</div>
+    <div id="irr-detail" class="hidden">
+      <div class="sub" style="margin-top:0.75rem;">Your sample on the USSL diagram
+        (salinity C1-C4 by EC, sodium S1-S4 by SAR)</div>
+      <div class="chart-box tall"><canvas id="ch-ussl"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div id="irr-charts" class="hidden">
+  <div class="grid cols-2">
+    <div class="card">
+      <h2>USSL classes in the training data</h2>
+      <div class="sub">Graph - samples per USSL class (rare classes excluded from ML)</div>
+      <div class="chart-box"><canvas id="ch-irr-dist"></canvas></div>
+    </div>
+    <div class="card">
+      <h2>Feature importance</h2>
+      <div class="sub">Graph - which ions drive the class prediction (training data only)</div>
+      <div class="chart-box tall"><canvas id="ch-irr-imp"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Confusion matrix (untouched test set)</h2>
+    <div id="irr-cm"></div>
+  </div>
+</div>
+<script src="/static/js/irrigation.js"></script>
+
+
+    <p class="footnote">
+      Guideline limits shown are typical WHO / BIS / EPA reference values and are for guidance
+      and charts only. Many samples in the training dataset exceed these limits yet are labelled
+      potable, so limits never create labels or model features. Predictions are statistical
+      estimates from the Kaggle Water Potability dataset and are not a substitute for
+      laboratory analysis.
+    </p>
+  </main>
+
+  <footer class="site">WATERNET - Water Quality Monitoring &amp; Potability Prediction (local, software-only demo)</footer>
+</body>
+</html>

@@ -1,0 +1,75 @@
+{
+  "RandomForest": {
+    "features": [
+      "ph",
+      "Hardness",
+      "Solids",
+      "Chloramines",
+      "Sulfate",
+      "Conductivity",
+      "Organic_carbon",
+      "Trihalomethanes",
+      "Turbidity"
+    ],
+    "values": [
+      0.1351,
+      0.1173,
+      0.1146,
+      0.1151,
+      0.1211,
+      0.1046,
+      0.0979,
+      0.0945,
+      0.0997
+    ]
+  },
+  "XGBoost": {
+    "features": [
+      "ph",
+      "Hardness",
+      "Solids",
+      "Chloramines",
+      "Sulfate",
+      "Conductivity",
+      "Organic_carbon",
+      "Trihalomethanes",
+      "Turbidity"
+    ],
+    "values": [
+      0.1464,
+      0.1255,
+      0.1119,
+      0.1361,
+      0.1218,
+      0.0834,
+      0.0862,
+      0.0899,
+      0.0988
+    ]
+  },
+  "RFE_ranking": {
+    "features": [
+      "ph",
+      "Hardness",
+      "Solids",
+      "Chloramines",
+      "Sulfate",
+      "Conductivity",
+      "Organic_carbon",
+      "Trihalomethanes",
+      "Turbidity"
+    ],
+    "values": [
+      1,
+      1,
+      1,
+      1,
+      2,
+      3,
+      5,
+      6,
+      4
+    ],
+    "note": "Rank 1 = selected (top 4); higher = eliminated earlier."
+  }
+}
