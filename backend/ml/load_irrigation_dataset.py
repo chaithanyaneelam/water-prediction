@@ -15,7 +15,6 @@ Cleaning (documented, never silent):
 import json
 import os
 import re
-import sys
 
 import numpy as np
 import pandas as pd
@@ -103,4 +102,4 @@ def main() -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    sys.exit(main() or 0)
+    main()
